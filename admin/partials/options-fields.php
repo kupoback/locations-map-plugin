@@ -26,12 +26,13 @@ switch ($args['type'])
 			foreach ($args['options'] as $key => $label)
 			{
 				// $i ++;
-				$options_markup .= sprintf('<label for="%1$s"><input id="%1$s" name="%1$s[]" type="%2$s" value="%3$s" %4$s /> %5$s</label><br/>',
-				                           $args['uid'],
-				                           $args['type'],
-				                           $key,
-				                           isset($value[0]) ? checked($value[array_search($key, $value, true)], $key, false) : '',
-				                           $label
+				$options_markup .= sprintf(
+					'<label for="%1$s"><input id="%1$s" name="%1$s[]" type="%2$s" value="%3$s" %4$s /> %5$s</label><br/>',
+					$args['uid'],
+					$args['type'],
+					$key,
+					isset($value[0]) ? checked($value[array_search($key, $value, true)], $key, false) : '',
+					$label
 				// $i
 				);
 			}
@@ -41,12 +42,13 @@ switch ($args['type'])
 	case 'text':
 	case 'password':
 	case 'number':
-		printf('<input class="regular-text" name="%1$s" id="%1$s" type="%2$s" placeholder="%3$s" value="%4$s" autocomplete="off" aria-label="%5$s" />',
-		       $args['uid'],
-		       $args['type'],
-		       $placeholder,
-		       $value,
-		       $args['title']
+		printf(
+			'<input class="regular-text" name="%1$s" id="%1$s" type="%2$s" placeholder="%3$s" value="%4$s" autocomplete="off" aria-label="%5$s" />',
+			$args['uid'],
+			$args['type'],
+			$placeholder,
+			$value,
+			$args['title']
 		);
 		break;
 	case 'textarea':
@@ -64,19 +66,21 @@ switch ($args['type'])
 			$options_markup = '';
 			foreach ($args['options'] as $key => $label)
 			{
-				$options_markup .= sprintf('<option value="%s" %s>%s</option>',
-				                           $key,
-				                           isset($value[0]) ? selected($value[array_search($key, $value, true)], $key, false) : '',
-				                           $label
+				$options_markup .= sprintf(
+					'<option value="%s" %s>%s</option>',
+					$key,
+			isset($value[0]) ? selected($value[array_search($key, $value, true)], $key, false) : '',
+					$label
 				);
 			}
 			if ($args['type'] === 'multiselect')
 				$attributes = ' multiple="multiple" ';
 			
-			printf('<select name="%1$s[]" id="%1$s" %2$s>%3$s</select>',
-			       $args['uid'],
-			       $attributes,
-			       $options_markup
+			printf(
+				'<select name="%1$s[]" id="%1$s" %2$s>%3$s</select>',
+				$args['uid'],
+				$attributes,
+				$options_markup
 			);
 		}
 		break;
@@ -85,15 +89,12 @@ switch ($args['type'])
 	  break;
 	case 'file' :
 	case 'image' :
+		$src = $title = '';
 		if (!empty($value))
 		{
 			$image_attributes = wp_get_attachment_image_src($value);
-			$src              = $image_attributes[0];
+			$src              = is_array($image_attributes) && !empty($image_attributes) ? $image_attributes[0] : null;
 			$title            = get_the_title($value);
-		}
-		else
-		{
-			$src = $title = '';
 		}
 		?>
 			<div class="lm-media-container">
