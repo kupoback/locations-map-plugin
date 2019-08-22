@@ -47,6 +47,15 @@ class Locations_Maps_Admin
 	private $version;
 	
 	/**
+	 * The media_fields of this plugin.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 * @var      string $plugin_name The ID of this plugin.
+	 */
+	private $meta_fields = [];
+	
+	/**
 	 * Initialize the class and set its properties.
 	 *
 	 * @since    1.0.0
@@ -54,12 +63,25 @@ class Locations_Maps_Admin
 	 * @param      string $plugin_name The name of this plugin.
 	 * @param      string $version     The version of this plugin.
 	 */
-	public function __construct($plugin_name, $version)
+	public function __construct($plugin_name, $version, $fields)
 	{
 		
 		$this->plugin_name = $plugin_name;
 		$this->version     = $version;
+		$this->meta_fields = $fields;
 		
+	}
+	
+	/**
+	 * Function Name: attach_meta_fields
+	 * Description: Returns meta fields
+	 *
+	 * @param $fields
+	 */
+	private function attach_meta_fields($fields)
+	{
+		
+		$this->meta_fields = $fields;
 	}
 	
 	/**
@@ -159,7 +181,7 @@ class Locations_Maps_Admin
 	
 	/**
 	 * Function Name: locations_maps_setup_sections
-	 * Description: Sets up the sections for the Options Page
+	 * Description: Sets up the sections for the Options Page based on their callback
 	 * Version: 1.0
 	 * Author: Nick Makris - Clique Studios
 	 * Author URI: buildsomething@cliquestudios.com
@@ -196,7 +218,7 @@ class Locations_Maps_Admin
 	
 	/**
 	 * Function Name: locations_maps_setup_fields
-	 * Description: Sets up the fields for the Options Page
+	 * Description: Sets up the fields for the Options Page based on their callback
 	 * Version: 1.0
 	 * Author: Nick Makris - Clique Studios
 	 * Author URI: buildsomething@cliquestudios.com
@@ -208,68 +230,9 @@ class Locations_Maps_Admin
 	public function locations_maps_setup_fields()
 	{
 		
-		$fields = [
-			// @TODO Integrate with the site
-			/*
-			[
-				'uid'     => 'locations_maps_toggle_location_taxonomy',
-				'title'   => 'Location Category',
-				'label_for' =>  'locations_maps_toggle_location_taxonomy',
-				'section' => 'locations_maps_section_one',
-				'type'    => 'checkbox',
-				'options' => [
-					'add_button' => __('Activate Taxonomy', 'textdomain'),
-				],
-				'default' => [],
-			],
-			*/
-			[
-				'uid'       => 'locations_maps_google_api_key',
-				'title'     => 'Google Maps API Key',
-				'label_for' => 'locations_maps_google_api_key',
-				'section'   => 'locations_maps_section_one',
-				'type'      => 'text',
-				'default'   => '',
-				'helper'    => 'Please obtain an API key from <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank" rel="noopener">here</a>. Click on "Get Started" when landing on the page.',
-			],
-			[
-				'uid'       => 'locations_maps_map_icon',
-				'title'     => 'Map Icon',
-				'label_for' => 'locations_maps_map_icon',
-				'section'   => 'locations_maps_section_one',
-				'type'      => 'image',
-				'default'   => '',
-			],
-			[
-				'uid'       => 'locations_map_map_style',
-				'title'     => 'Map Style',
-				'section'   => 'locations_maps_section_one',
-				'label_for' => 'locations_map_map_style',
-				'type'      => 'select',
-				'options'   => [
-					'none'      => 'Select',
-					'aubergine' => 'Aubergine',
-					'dark'      => 'Dark',
-					'night'     => 'Night',
-					'retro'     => 'Retro',
-					'silver'    => 'Silver',
-					'other'     => 'Other',
-				],
-				'default'   => [],
-			],
-			[
-				'uid'       => 'locations_maps_style_override',
-				'title'     => 'Map Style',
-				'label_for' => 'locations_maps_style_override',
-				'section'   => 'locations_maps_section_one',
-				'type'      => 'file',
-				'helper'    => 'Please use JSON files only.',
-				'default'   => '',
-			],
-		];
-		
+		if (!empty($this->meta_fields))
 		// Run through each field array and register the setting
-		foreach ($fields as $field)
+		foreach ( (array) $this->meta_fields as $field)
 		{
 			add_settings_field($field['uid'],
 				$field['title'],
@@ -290,7 +253,7 @@ class Locations_Maps_Admin
 	
 	/**
 	 * Function Name: locations_maps_options_page
-	 * Description: Grabs the options page
+	 * Description: The actual form HTML for the page, minus the declared function sections
 	 * Version: 1.0
 	 * Author: Nick Makris - Clique Studios
 	 * Author URI: buildsomething@cliquestudios.com
@@ -307,7 +270,7 @@ class Locations_Maps_Admin
 	
 	/**
 	 * Function Name: locations_maps_shortcode_menu_page
-	 * Description: Grabs the menu page
+	 * Description: The base holder for each option page
 	 * Version: 1.0
 	 * Author: Nick Makris - Clique Studios
 	 * Author URI: buildsomething@cliquestudios.com
@@ -324,7 +287,7 @@ class Locations_Maps_Admin
 	
 	/**
 	 * Function Name: locations_maps_section_callback
-	 * Description: Creates the sections
+	 * Description: Creates the sections for the options page
 	 * Version: 1.0
 	 * Author: Nick Makris - Clique Studios
 	 * Author URI: buildsomething@cliquestudios.com
@@ -336,13 +299,12 @@ class Locations_Maps_Admin
 	 */
 	public function locations_maps_section_callback($args)
 	{
-		
 		include(plugin_dir_path(__FILE__) . '/partials/options-section.php');
 	}
 	
 	/**
 	 * Function Name: locations_maps_field_callback
-	 * Description: Creates the fields
+	 * Description: Creates the fields for the options page
 	 * Version: 1.0
 	 * Author: Nick Makris - Clique Studios
 	 * Author URI: buildsomething@cliquestudios.com
@@ -354,7 +316,6 @@ class Locations_Maps_Admin
 	 */
 	public function locations_maps_field_callback($args)
 	{
-		
 		include(plugin_dir_path(__FILE__) . '/partials/options-fields.php');
 	}
 	

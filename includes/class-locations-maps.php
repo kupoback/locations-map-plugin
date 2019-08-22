@@ -56,6 +56,16 @@ class Locations_Maps {
 	 * @var      string    $version    The current version of the plugin.
 	 */
 	protected $version;
+	
+	/**
+	 * The meta fields passed through to media
+	 *
+	 * @since    1.0.0
+	 * @access   protected
+	 * @var      array $meta_fields The return array of meta fields to add
+	 *
+	 */
+	protected $meta_fields;
 
 	/**
 	 * Define the core functionality of the plugin.
@@ -98,7 +108,12 @@ class Locations_Maps {
 	 * @access   private
 	 */
 	private function load_dependencies() {
-
+		
+		/**
+		 * The declaration of custom fields added to the options page
+		 */
+		$this->meta_fields = require_once plugin_dir_path(dirname(__FILE__)) . 'admin/meta_fields/option-fields.php';
+		
 		/**
 		 * The class responsible for orchestrating the actions and filters of the
 		 * core plugin.
@@ -172,7 +187,7 @@ class Locations_Maps {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Locations_Maps_Admin( $this->get_plugin_name(), $this->get_version() );
+		$plugin_admin = new Locations_Maps_Admin( $this->get_plugin_name(), $this->get_version(), $this->get_meta_fields() );
 		$plugin_cpt = new Locations_Maps_Custom_Post_Type( $this->get_plugin_name(), $this->get_version() );
 		$plugin_mb = new Locations_Maps_Metaboxes( $this->get_plugin_name(), $this->get_version() );
 
@@ -249,6 +264,12 @@ class Locations_Maps {
 	 */
 	public function get_version() {
 		return $this->version;
+	}
+	
+	public function get_meta_fields()
+	{
+		
+		return $this->meta_fields;
 	}
 
 }
