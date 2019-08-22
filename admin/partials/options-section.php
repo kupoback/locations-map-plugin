@@ -12,6 +12,6 @@
 switch ( $args['id'] ) {
 	case 'locations_maps_section_one' :
 		break;
-//	case 'cs_cmf_sc_section_two' :
-//		break;
+	case 'locations_maps_section_two' :
+		break;
 }

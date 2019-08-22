@@ -1,17 +1,19 @@
 <?php
-/**
- * File: class-locations-maps-metaboxes.php
- * Description:
- * Version: 1.0
- * Author: Nick Makris @kupoback
- * Author URI: https://makris.io
- *
- * @package mdhpartners
- */
+
+//Exit if accessed directly
+if (!defined('ABSPATH')) { exit; }
 
 /**
- * Check if our function is defined before this file is called.
+ * File: class-locations-maps-metaboxes.php
+ * Description: Our metabox built out for the locations maps
+ * @link       https://makris.io
+ * @since      1.0.0
+ *
+ * @package    Locations_Maps
+ * @subpackage Locations_Maps/admin
+ * @author     Nick Makris <nick@makris.io>
  */
+
 class Locations_Maps_Metaboxes
 {
 	
@@ -66,6 +68,8 @@ class Locations_Maps_Metaboxes
    * @param string $plugin_name The name of this plugin.
    * @param string $version     The version of this plugin.
    * @param array  $fields      An array of fields for the locations post type
+	 * @param array  $save_fields An array of fields to save
+	 * @param array  $custom_fields An array of non-core custom fields
 	 *
 	 * @since    1.0.0
 	 *
@@ -342,18 +346,6 @@ class Locations_Maps_Metaboxes
 		!is_null($site) ? update_post_meta($id, '_map_website', $site) : null;
 	}
 	
-	/**
-	 * Function Name: locations_maps_scripts
-	 * Description: The map scripts to add
-	 * Version: 1.0
-	 * Author: Nick Makris @kupoback
-	 *
-	 *
-	 */
-	function locations_maps_scripts()
-	{
-	
-	}
 	
 	/**
 	 * Function Name: locations_maps_add_custom_fields
@@ -396,21 +388,6 @@ class Locations_Maps_Metaboxes
 	{
 		
 		$data = [];
-		
-		// $fields = [
-		// 	'_map_address',
-		// 	'_map_address2',
-		// 	'_map_city',
-		// 	'_map_state',
-		// 	'_map_zip',
-		// 	// '_map_country',
-		// 	'_map_lat',
-		// 	'_map_lng',
-		// 	// '_map_placeID',
-		// 	'_map_phone',
-		// 	'_map_email',
-		// 	'_map_website',
-		// ];
 		
 		if ( !empty($this->save_fields) )
 		{

@@ -1,25 +1,15 @@
 <?php
-
-if (!defined('ABSPATH'))
-{
-	exit;//Exit if accessed directly
-}
-
-/**
- * The admin-specific functionality of the plugin.
- *
- * @link       https://makris.io
- * @since      1.0.0
- *
- * @package    Locations_Maps
- * @subpackage Locations_Maps/admin
- */
+//Exit if accessed directly
+if (!defined('ABSPATH')) { exit; }
 
 /**
  * The admin-specific functionality of the plugin.
  *
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the admin-specific stylesheet and JavaScript.
+ *
+ * @link       https://makris.io
+ * @since      1.0.0
  *
  * @package    Locations_Maps
  * @subpackage Locations_Maps/admin
@@ -47,11 +37,11 @@ class Locations_Maps_Admin
 	private $version;
 	
 	/**
-	 * The meta_fields of this plugin.
+	 * The meta_fields to register to the options page
 	 *
 	 * @since    1.0.0
 	 * @access   private
-	 * @var      string $plugin_name The ID of this plugin.
+	 * @var      string $meta_fields The meta fields to register
 	 */
 	private $meta_fields = [];
 	
@@ -72,18 +62,6 @@ class Locations_Maps_Admin
 		$this->version     = $version;
 		$this->meta_fields = $fields;
 		
-	}
-	
-	/**
-	 * Function Name: attach_meta_fields
-	 * Description: Returns meta fields
-	 *
-	 * @param $fields
-	 */
-	private function attach_meta_fields($fields)
-	{
-		
-		$this->meta_fields = $fields;
 	}
 	
 	/**
@@ -194,11 +172,19 @@ class Locations_Maps_Admin
 	 */
 	public function locations_maps_setup_sections()
 	{
-		
 		$sections = [
 			[
 				'id'       => 'locations_maps_section_one',
-				'title'    => '',
+				'title'    => 'Google Maps Settings',
+				'callback' => [
+					$this,
+					'locations_maps_section_callback',
+				],
+				'function' => 'locations_maps_fields',
+			],
+			[
+				'id'       => 'locations_maps_section_two',
+				'title'    => 'Content Settings',
 				'callback' => [
 					$this,
 					'locations_maps_section_callback',
@@ -206,11 +192,11 @@ class Locations_Maps_Admin
 				'function' => 'locations_maps_fields',
 			],
 		];
-		
 		// Run through each section and register them
 		foreach ($sections as $section)
 		{
-			add_settings_section($section['id'],
+			add_settings_section(
+				$section['id'],
 				$section['title'],
 				$section['callback'],
 				$section['function']
@@ -287,6 +273,7 @@ class Locations_Maps_Admin
 		include(plugin_dir_path(__FILE__) . '/menu-pages/main-menu.php');
 	}
 	
+	
 	/**
 	 * Function Name: locations_maps_section_callback
 	 * Description: Creates the sections for the options page
@@ -295,8 +282,6 @@ class Locations_Maps_Admin
 	 * Author URI: buildsomething@cliquestudios.com
 	 *
 	 * @package Locations_Maps
-	 *
-	 * @param $args
 	 *
 	 */
 	public function locations_maps_section_callback($args)

@@ -1,16 +1,16 @@
 <?php
-if(!defined('ABSPATH')){
-	exit;//Exit if accessed directly
-}
+//Exit if accessed directly
+if (!defined('ABSPATH')) { exit; }
 
 /**
  * File: class-locations-maps-custom-post-type.php
- * Description:
- * Version: 1.0
- * Author: Nick Makris - Clique Studios
- * Author URI: buildsomething@cliquestudios.com
+ * Description: Our Custom Post Type for locations
+ * @link       https://makris.io
+ * @since      1.0.0
  *
- * @package Locations_Maps
+ * @package    Locations_Maps
+ * @subpackage Locations_Maps/admin
+ * @author     Nick Makris <nick@makris.io>
  */
 
 class Locations_Maps_Custom_Post_Type

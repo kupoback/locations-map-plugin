@@ -197,6 +197,11 @@ class Locations_Maps {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-locations-maps-metaboxes.php';
 		
 		/**
+		 * The class extending the REST_API
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-locations-maps-api.php';
+		
+		/**
 		 * This class allows for a use of get_template_part in the theme
 		 */
 		require_once LOCATIONS_MAPS_PLUGIN_PATH . 'public/class-gamajo-template-loader.php';
@@ -242,19 +247,18 @@ class Locations_Maps {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Locations_Maps_Admin( $this->get_plugin_name(), $this->get_version(), $this->get_option_meta_fields() );
-		$plugin_cpt = new Locations_Maps_Custom_Post_Type( $this->get_plugin_name(), $this->get_version() );
-		$plugin_mb = new Locations_Maps_Metaboxes( $this->get_plugin_name(), $this->get_version(), $this->get_post_meta_fields(), $this->get_save_meta_fields(), $this->get_non_core_meta_fields() );
-
+		$plugin_admin = new Locations_Maps_Admin( $this->get_plugin_name(), $this->get_version(), $this->get_option_meta_fields());
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 		$this->loader->add_action('admin_menu', $plugin_admin, 'locations_maps_menu_page');
-		$this->loader->add_action('admin_init', $plugin_admin, 'locations_maps_setup_sections');
+		$this->loader->add_action('admin_init', $plugin_admin, 'locations_maps_setup_sections', 1);
 		$this->loader->add_action('admin_init', $plugin_admin, 'locations_maps_setup_fields');
 		$this->loader->add_filter('upload_mimes', $plugin_admin, 'locations_maps_add_json_mime', 1, 1 );
 		
+		$plugin_cpt = new Locations_Maps_Custom_Post_Type( $this->get_plugin_name(), $this->get_version() );
 		$this->loader->add_action( 'init', $plugin_cpt, 'custom_post_type_locations' );
 		
+		$plugin_mb = new Locations_Maps_Metaboxes( $this->get_plugin_name(), $this->get_version(), $this->get_post_meta_fields(), $this->get_save_meta_fields(), $this->get_non_core_meta_fields() );
 		$this->loader->add_action( 'add_meta_boxes', $plugin_mb, 'locations_maps_metabox' );
 		$this->loader->add_action( 'save_post', $plugin_mb, 'locations_maps_metabox_save', 10, 2 );
 		$this->loader->add_action( 'wp_ajax_nopriv_geo_cb', $plugin_mb, 'locations_maps_metabox_ajax');
