@@ -26,7 +26,7 @@ $meta_fields = [
 		'uid'       =>  'locations_maps_no_results_text',
 		'title'     =>  'No Results Text',
 		'section'   =>  'locations_maps_section_two',
-		'type'      =>  'textarea',
+		'type'      =>  'wysiwyg',
 		'default'   =>  'No results found.',
 		'helper'    =>  ''
 	],

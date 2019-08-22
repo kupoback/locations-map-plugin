@@ -285,6 +285,17 @@
 }
 
 @media (min-width: 768px) {
+  .locations-map-settings {
+    max-width: 70%;
+  }
+}
+@media (min-width: 992px) {
+  .locations-map-settings {
+    max-width: 55%;
+  }
+}
+
+@media (min-width: 768px) {
   .map-elements-inside .map-row .map-field.one-quarter {
     -webkit-box-flex: 0;
     -ms-flex: 0 0 25%;
