@@ -11,10 +11,7 @@
  * @package Locations_Maps
  */
 
-$value = get_option($args['uid']);
-
-if (!$value)
-	$value = $args['default'];
+$value = get_option($args['uid']) ?: $args['default'];
 
 $placeholder = isset($args['placeholder']) ? $args['placeholder'] : '';
 $helper      = isset($args['helper']) ? $args['helper'] : '';
@@ -84,7 +81,7 @@ switch ($args['type'])
 		}
 		break;
 	case 'wysiwyg' :
-	  wp_editor( $args['default'], $args['uid'], $settings = ['textarea_rows'=> '10'] );
+	  wp_editor( $value, $args['uid'], $settings = ['textarea_rows'=> '10', 'media_buttons' => false] );
 	  break;
 	case 'file' :
 	case 'image' :
