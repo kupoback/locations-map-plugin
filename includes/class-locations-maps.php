@@ -58,7 +58,17 @@ class Locations_Maps {
 	protected $version;
 	
 	/**
-	 * The meta fields passed through to media
+	 * The meta fields passed through to the options page
+	 *
+	 * @since    1.0.0
+	 * @access   protected
+	 * @var      array $opt_meta_fields The return array of meta fields to add
+	 *
+	 */
+	protected $opt_meta_fields;
+	
+	/**
+	 * The meta fields passed through to the options page
 	 *
 	 * @since    1.0.0
 	 * @access   protected
@@ -66,6 +76,36 @@ class Locations_Maps {
 	 *
 	 */
 	protected $meta_fields;
+	
+	/**
+	 * The meta fields passed through to locations post type
+	 *
+	 * @since    1.0.0
+	 * @access   protected
+	 * @var      array $meta_fields The return array of meta fields to add
+	 *
+	 */
+	protected $post_fields;
+	
+	/**
+	 * The meta fields passed through to save function
+	 *
+	 * @since    1.0.0
+	 * @access   protected
+	 * @var      array $meta_fields The return array of meta fields to save
+	 *
+	 */
+	protected $save_fields;
+	
+	/**
+	 * The meta fields passed through to add to various core metaboxes
+	 *
+	 * @since    1.0.0
+	 * @access   protected
+	 * @var      array $non_core_fields The return array of meta fields to add
+	 *
+	 */
+	protected $non_core_fields;
 
 	/**
 	 * Define the core functionality of the plugin.
@@ -112,7 +152,22 @@ class Locations_Maps {
 		/**
 		 * The declaration of custom fields added to the options page
 		 */
-		$this->meta_fields = require_once plugin_dir_path(dirname(__FILE__)) . 'admin/meta_fields/option-fields.php';
+		$this->opt_meta_fields = require_once plugin_dir_path(dirname(__FILE__)) . 'admin/meta_fields/option-fields.php';
+		
+		/**
+		 * The declaration of custom fields added to the locations post type
+		 */
+		$this->meta_fields = require_once plugin_dir_path(dirname(__FILE__)) . 'admin/meta_fields/post-meta-fields.php';
+		
+		/**
+		 * The declaration of custom fields used for saving via submit or ajax
+		 */
+		$this->save_fields = require_once plugin_dir_path(dirname(__FILE__)) . 'admin/meta_fields/post-save-fields.php';
+		
+		/**
+		 * The declaration of custom fields added to the core wordpress metaboxes
+		 */
+		$this->non_core_fields = require_once plugin_dir_path(dirname(__FILE__)) . 'admin/meta_fields/non-metabox-custom-fields.php';
 		
 		/**
 		 * The class responsible for orchestrating the actions and filters of the
@@ -187,9 +242,9 @@ class Locations_Maps {
 	 */
 	private function define_admin_hooks() {
 
-		$plugin_admin = new Locations_Maps_Admin( $this->get_plugin_name(), $this->get_version(), $this->get_meta_fields() );
+		$plugin_admin = new Locations_Maps_Admin( $this->get_plugin_name(), $this->get_version(), $this->get_option_meta_fields() );
 		$plugin_cpt = new Locations_Maps_Custom_Post_Type( $this->get_plugin_name(), $this->get_version() );
-		$plugin_mb = new Locations_Maps_Metaboxes( $this->get_plugin_name(), $this->get_version() );
+		$plugin_mb = new Locations_Maps_Metaboxes( $this->get_plugin_name(), $this->get_version(), $this->get_post_meta_fields(), $this->get_save_meta_fields(), $this->get_non_core_meta_fields() );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
@@ -266,10 +321,46 @@ class Locations_Maps {
 		return $this->version;
 	}
 	
-	public function get_meta_fields()
+	/**
+	 * Function Name: get_option_meta_fields
+	 * Description: The option meta fields
+	 *
+	 * @return array
+	 */
+	public function get_option_meta_fields()
 	{
-		
+		return $this->opt_meta_fields;
+	}
+	
+	/**
+	 * Function Name: get_post_meta_fields
+	 * Description: The post type meta fields
+	 *
+	 * @return array
+	 */
+	public function get_post_meta_fields()
+	{
 		return $this->meta_fields;
+	}
+	
+	/**
+	 * Function Name: save_meta_fields
+	 * Description: The common saved meta fields
+	 *
+	 * @return array
+	 */
+	public function get_save_meta_fields() {
+		return $this->save_fields;
+	}
+	
+	/**
+	 * Function Name: non_core_meta_fields
+	 * Description: Non core meta fields
+	 *
+	 * @return array
+	 */
+	public function get_non_core_meta_fields() {
+		return $this->non_core_fields;
 	}
 
 }

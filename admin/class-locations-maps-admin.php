@@ -47,7 +47,7 @@ class Locations_Maps_Admin
 	private $version;
 	
 	/**
-	 * The media_fields of this plugin.
+	 * The meta_fields of this plugin.
 	 *
 	 * @since    1.0.0
 	 * @access   private
@@ -58,10 +58,12 @@ class Locations_Maps_Admin
 	/**
 	 * Initialize the class and set its properties.
 	 *
+	 * @param string $plugin_name The name of this plugin.
+	 * @param string $version     The version of this plugin.
+	 * @param array  $fields      An array of fields for the otpions page
+	 *
 	 * @since    1.0.0
 	 *
-	 * @param      string $plugin_name The name of this plugin.
-	 * @param      string $version     The version of this plugin.
 	 */
 	public function __construct($plugin_name, $version, $fields)
 	{
