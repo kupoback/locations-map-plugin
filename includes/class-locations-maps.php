@@ -216,6 +216,11 @@ class Locations_Maps {
 		 * side of the site.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-locations-maps-public.php';
+		
+		/**
+		 * The class responsible for defining all accessible functions.
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/locations-maps-public-functions.php';
 
 		$this->loader = new Locations_Maps_Loader();
 

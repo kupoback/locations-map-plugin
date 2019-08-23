@@ -220,7 +220,7 @@ class Locations_Maps_Metaboxes
 								<input type="button" name="geo_reset" class="btn" id="geo_reset" value="<?php _e('Reset Geo Location'); ?>" />
 								<input type="button" name="form-reset" class="btn" id="form-reset" value="<?php _e('Form Reset'); ?>" />
 							</div>
-							<input type="hidden" id="map_api_key" value="<?php echo get_option('locations_maps_google_api_key'); ?>" />
+							<input type="hidden" id="map_api_key" value="<?php echo isset(get_option('lm_options')['google_api_key']) ? get_option('lm_options')['google_api_key'] : null; ?>" />
 				      <?php foreach ($hidden as $hid) { echo $hid; } ?>
 						</div>
 					</div>
@@ -282,10 +282,10 @@ class Locations_Maps_Metaboxes
 	    //		{
 	    //			update_post_meta($post_id, '_center_location', $_POST['_center_location']);
 	    //
-	    //			if (get_option('locations_map_center_lat') !== get_post_meta($post_id, '_map_lat', true))
+	    //			if (isset(get_option('lm_options')['center_lat'])) !== get_post_meta($post_id, '_map_lat', true))
 	    //			{
-	    //				update_option('locations_map_center_lat', $_POST['_map_lat']);
-	    //				update_option('locations_map_center_lng', $_POST['_map_lng']);
+	    //				update_option('lm_options']['center_lat'], $_POST['_map_lat']);
+	    //				update_option('lm_options']'center_lng'], $_POST['_map_lng']);
 	    //			}
 	    //
 	    //		}
@@ -293,10 +293,10 @@ class Locations_Maps_Metaboxes
 	    //		{
 	    //			delete_post_meta($post_id, '_center_location');
 	    //
-	    //			if ( get_option('locations_map_center_lat') === get_post_meta($post_id, '_map_lat', true))
+	    //			if (isset(get_option('lm_options')['center_lat']))=== get_post_meta($post_id, '_map_lat', true))
 	    //			{
-	    //				delete_option('locations_map_center_lat');
-	    //				delete_option('locations_map_center_lng');
+	    //				delete_option('lm_options'])['center_lat'];
+	    //				delete_option('lm_options')['center_lng'];
 	    //			}
 	    //		}
     }
@@ -395,6 +395,10 @@ class Locations_Maps_Metaboxes
 		return get_post_meta($object['id']);
 	}
 	
+	/**
+	 * Function Name: locations_maps_update_box_custom_fields
+	 * Description:
+	 */
 	function locations_maps_update_box_custom_fields()
   {
 	  

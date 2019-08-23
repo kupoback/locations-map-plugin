@@ -92,7 +92,7 @@ class Locations_Maps_API extends \WP_REST_Controller
 		$this->google_api_url = 'https://maps.googleapis.com/maps/api/geocode/json?';
 		$this->address = 'address=';
 		$this->libraries = '&libraries=geometry';
-		$this->api_key = get_option('locations_maps_google_api_key');
+		$this->api_key = get_option('lm_options')['google_api_key'];
 		
 	}
 	

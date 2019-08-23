@@ -31,14 +31,14 @@ $meta_fields = [
 		'helper'    =>  ''
 	],
 	// [
-	// 	'uid'       => 'locations_maps_map_icon',
+	// 	'uid'       => 'map_icon',
 	// 	'title'     => 'Map Icon',
 	// 	'section'   => 'locations_maps_section_one',
 	// 	'type'      => 'image',
 	// 	'default'   => '',
 	// ],
 	// [
-	// 	'uid'       => 'locations_map_map_style',
+	// 	'uid'       => 'map_style',
 	// 	'title'     => 'Map Style',
 	// 	'section'   => 'locations_maps_section_one',
 	// 	'type'      => 'select',
@@ -54,7 +54,7 @@ $meta_fields = [
 	// 	'default'   => [],
 	// ],
 	// [
-	// 	'uid'       => 'locations_maps_style_override',
+	// 	'uid'       => 'style_override',
 	// 	'title'     => 'Map Style',
 	// 	'section'   => 'locations_maps_section_one',
 	// 	'type'      => 'file',

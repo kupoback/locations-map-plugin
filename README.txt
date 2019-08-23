@@ -3,8 +3,8 @@ Contributors: @kupoback
 Donate link: https://makris.io
 Tags: google maps
 Requires at least: 3.0.1
-Tested up to: 3.4
-Stable tag: 4.3
+Tested up to: 5.2.2
+Stable tag: 5.2.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -66,6 +66,12 @@ directory take precedence. For example, `/assets/screenshot-1.png` would win ove
 2. This is the second screen shot
 
 == Changelog ==
+
+= 1.2.0 =
+* Reworked the options settings
+* Migrated all the fields into their own file for easier management
+* Updated callbacks to the individual options
+* Added public callable functions to retrieve values of the options
 
 = 1.0 =
 * A change since the previous version.

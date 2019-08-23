@@ -3,16 +3,6 @@
 /**
  * The public-facing functionality of the plugin.
  *
- * @link       https://makris.io
- * @since      1.0.0
- *
- * @package    Locations_Maps
- * @subpackage Locations_Maps/public
- */
-
-/**
- * The public-facing functionality of the plugin.
- *
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the public-facing stylesheet and JavaScript.
  *
@@ -103,12 +93,21 @@ class Locations_Maps_Public
 		 * class.
 		 */
 		
-		$api_key = get_option('locations_maps_google_api_key');
+		$api_key = isset(get_option('lm_options')['google_api_key']) ? get_option('lm_options')['google_api_key'] : null;
 		
 		// wp_register_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/locations-maps-public.min.js', ['jquery'], $this->version, true);
 		wp_register_script($this->plugin_name . '-google-maps', "https://maps.googleapis.com/maps/api/js?key={$api_key}&libraries=geometry&callback=initMap", ['jquery'], '', true);
 	}
 	
+	/**
+	 * Function Name: add_async_defer_google_maps
+	 * Description: Need to add defer and possibly async to google maps script
+	 *
+	 * @param $tag
+	 * @param $handle
+	 *
+	 * @return mixed
+	 */
 	public function add_async_defer_google_maps($tag, $handle)
 	{
 		return $this->plugin_name . '-google-maps' === $handle ? str_replace(' src', ' defer src', $tag) : $tag;
@@ -161,7 +160,7 @@ class Locations_Maps_Public
 		$map_vars = [
 			'mapStyling'           => $map_style,
 			'mapZoom'              => $atts['zoom'],
-			'mapIcon'              => get_option('locations_maps_map_icon') ?: plugin_dir_url(__FILE__) . 'media/pin-circle.svg',
+			'mapIcon'              => isset(get_option('lm_options')['map_icon']) ? get_option('lm_options')['map_icon'] : plugin_dir_url(__FILE__) . 'media/pin-circle.svg',
 			// 'mapPopup'             => $atts['disable_popup'],
 			// 'mapDisableInfoWindow' => $atts['disabled_info'],
 		];
@@ -173,8 +172,8 @@ class Locations_Maps_Public
 			$map_vars['mapCenterLng'] = get_post_meta($atts['post_id'], '_map_lng', true);
 		}
 		else {
-			get_option('locations_map_center_lat') ? $map_vars['mapCenterLat'] = get_option('locations_map_center_lat') : null;
-			get_option('locations_map_center_lng') ? $map_vars['mapCenterLng'] = get_option('locations_map_center_lng') : null;
+			isset(get_option('lm_options')['center_lat']) ? $map_vars['mapCenterLat'] = get_option('lm_options')['center_lat'] : null;
+			isset(get_option('lm_options')['center_lng']) ? $map_vars['mapCenterLng'] = get_option('lm_options')['center_lng'] : null;
 		}
 		
 		// wp_localize_script($this->plugin_name, 'MAP_VARS', $map_vars);
@@ -190,6 +189,14 @@ class Locations_Maps_Public
 		return ob_get_clean();
 	}
 	
+	/**
+	 * Function Name: location_short_code
+	 * Description: Post Template Part displaying data from Locations Post Type. Contains overridable template
+	 *
+	 * @param $atts
+	 *
+	 * @return false|string
+	 */
 	public function location_short_code($atts)
 	{
 		
