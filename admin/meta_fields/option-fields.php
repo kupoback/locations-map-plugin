@@ -30,37 +30,37 @@ $meta_fields = [
 		'default'   =>  'No results found.',
 		'helper'    =>  ''
 	],
-	// [
-	// 	'uid'       => 'locations_maps_map_icon',
-	// 	'title'     => 'Map Icon',
-	// 	'section'   => 'locations_maps_section_one',
-	// 	'type'      => 'image',
-	// 	'default'   => '',
-	// ],
-	// [
-	// 	'uid'       => 'locations_map_map_style',
-	// 	'title'     => 'Map Style',
-	// 	'section'   => 'locations_maps_section_one',
-	// 	'type'      => 'select',
-	// 	'options'   => [
-	// 		'none'      => 'Select',
-	// 		'aubergine' => 'Aubergine',
-	// 		'dark'      => 'Dark',
-	// 		'night'     => 'Night',
-	// 		'retro'     => 'Retro',
-	// 		'silver'    => 'Silver',
-	// 		'other'     => 'Other',
-	// 	],
-	// 	'default'   => [],
-	// ],
-	// [
-	// 	'uid'       => 'locations_maps_style_override',
-	// 	'title'     => 'Map Style',
-	// 	'section'   => 'locations_maps_section_one',
-	// 	'type'      => 'file',
-	// 	'helper'    => 'Please use JSON files only.',
-	// 	'default'   => '',
-	// ],
+	[
+		'uid'       => 'locations_maps_map_icon',
+		'title'     => 'Map Icon',
+		'section'   => 'locations_maps_section_one',
+		'type'      => 'image',
+		'default'   => '',
+	],
+	[
+		'uid'       => 'locations_map_map_style',
+		'title'     => 'Map Style',
+		'section'   => 'locations_maps_section_one',
+		'type'      => 'select',
+		'options'   => [
+			'none'      => 'Select',
+			'aubergine' => 'Aubergine',
+			'dark'      => 'Dark',
+			'night'     => 'Night',
+			'retro'     => 'Retro',
+			'silver'    => 'Silver',
+			'other'     => 'Other',
+		],
+		'default'   => [],
+	],
+	[
+		'uid'       => 'locations_maps_style_override',
+		'title'     => 'Map Style',
+		'section'   => 'locations_maps_section_one',
+		'type'      => 'file',
+		'helper'    => 'Please use JSON files only.',
+		'default'   => '',
+	],
 ];
 
 return $meta_fields;

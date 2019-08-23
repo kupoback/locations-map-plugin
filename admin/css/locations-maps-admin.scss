@@ -63,7 +63,10 @@ $red: #c0392b;
 }
 .lm-media-container {
 	position: relative;
-	float: left;
+	display: flex;
+	.locations-map-hover {
+		order: 2;
+	}
 	.lm-icon {
 		display:         inline-block;
 		height:          36px;

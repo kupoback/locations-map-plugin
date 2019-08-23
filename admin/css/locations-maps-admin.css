@@ -155,7 +155,10 @@
 
 .lm-media-container {
   position: relative;
-  float: left;
+  display: flex;
+}
+.lm-media-container .locations-map-hover {
+  order: 2;
 }
 .lm-media-container .lm-icon {
   display: inline-block;

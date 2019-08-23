@@ -2,21 +2,23 @@
 ( function ($) {
 	"use strict";
 	
-	var mediaUploader;
+	let mediaUploader;
 	
 	$( "[data-name=\"hidden-media\"]" ).each( function () {
 		if ( this.value ) {
 			$( this ).siblings( ".no-value" ).addClass( "hide" );
 			$( this ).siblings( ".has-value" ).removeClass( "hide" );
+      $( this ).siblings( '.locations-map-hover' ).removeClass('hide');
 		}
 		else {
 			$( this ).siblings( ".no-value" ).removeClass( "hide" );
 			$( this ).siblings( ".has-value" ).addClass( "hide" );
+			$( this ).siblings( '.locations-map-hover' ).addClass('hide');
 		}
 	} );
 	
 	$( ".lm-media-container [data-name=\"add\"], [data-name=\"edit\"]" ).on( "click", function (e) {
-		var $this = $( this );
+		let $this = $( this );
 		e.preventDefault();
 		if ( mediaUploader ) {
 			mediaUploader.open();
@@ -41,7 +43,7 @@
 			} );
 		}
 		mediaUploader.on( "select", function () {
-			var attachment    = mediaUploader.state().get( "selection" ).first().toJSON(),
+			let attachment    = mediaUploader.state().get( "selection" ).first().toJSON(),
 			    thisContainer = $this.parents( ".lm-media-container" ),
 			    dataMedia     = $( thisContainer ).find( "[data-name=\"media\"]" ),
 			    dataHidden    = $( thisContainer ).find( "[data-name=\"hidden-media\"]" );
@@ -60,12 +62,13 @@
 			// Toggle the divs
 			thisContainer.children( ".no-value" ).addClass( "hide" );
 			thisContainer.children( ".has-value" ).removeClass( "hide" );
+			thisContainer.children( '.locations-map-hover' ).removeClass('hide');
 		} );
 		mediaUploader.open();
 	} );
 	
 	$( "[data-name=\"remove\"]" ).on( "click", function (e) {
-		var $this         = $( this ),
+		let $this         = $( this ),
 		    thisContainer = $this.parents( ".lm-media-container" ),
 		    dataMedia     = $( thisContainer ).find( "[data-name=\"media\"]" ),
 		    dataHidden    = $( thisContainer ).find( "[data-name=\"hidden-media\"]" );
@@ -86,6 +89,7 @@
 		// Toggle the divs
 		thisContainer.children( ".no-value" ).removeClass( "hide" );
 		thisContainer.children( ".has-value" ).addClass( "hide" );
+		thisContainer.children( '.locations-map-hover' ).addClass( 'hide' );
 		
 	} );
 	

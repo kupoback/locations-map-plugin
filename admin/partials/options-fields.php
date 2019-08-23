@@ -96,32 +96,38 @@ switch ($args['type'])
 			$src              = is_array($image_attributes) && !empty($image_attributes) ? $image_attributes[0] : null;
 			$title            = get_the_title($value);
 		}
-		?>
-			<div class="lm-media-container">
-				<input type="hidden" name="<?php echo $args['uid']; ?>" value="<?php echo $value; ?>" data-name="hidden-media" />
-				<div class="has-value media-wrap hide <?php echo $args['type']; ?>-type">
-			<?php if ($args['type'] === 'image') : ?>
-							<span class="image"><img src="<?php echo $src; ?>" data-src="<?php echo $src; ?>" data-name="media" /></span>
-			<?php elseif ($args['type'] === 'file') : ?>
-							<p class="file-name" data-name="media"><b>File Name</b>: <span><?php echo $title; ?></span></p>
-			<?php endif; ?>
-					<div class="locations-map-hover">
-						<p id="lm-edit" class="lm-icon -change" data-name="edit" title="Change"></p>
-						<p id="lm-remove" class="lm-icon -remove" data-name="remove" title="Remove"></p>
-					</div>
-				</div>
-				<div class="no-value hide">
-			<?php if ($args['type'] === 'image') : ?>
-							<p><?php _e('No image selected', 'locations-maps'); ?></p>
-							<p><input type="button" id="locations_map-media-upload" class="button button-primary" value="Select Image" data-name="add"></p>
-			<?php elseif ($args['type'] === 'file') : ?>
-							<p><?php _e('No file selected', 'locations-maps'); ?></p>
-							<p><input type="button" id="locations_map-media-upload" class="button button-primary" value="Select File" data-name="add"></p>
-			<?php endif; ?>
-				</div>
-			</div>
-		<?php
 		
+		$hidden = sprintf(
+			'<input type="hidden" name="%s" value="%s" data-name="hidden-media" />',
+				$args['uid'],
+				$value
+		);
+		$hover = sprintf(
+			'<div class="locations-map-hover hide"><p id="lm-edit" class="lm-icon -change" data-name="edit" title="%s"></p><p id="lm-remove" class="lm-icon -remove" data-name="remove" title="%s"></p></div>',
+				__('Change'),
+				__('Remove')
+		);
+		$has_value = sprintf(
+			'<div class="has-value media-wrap hide %s-type">%s</div>',
+				$args['type'],
+				$args['type'] === 'image'
+					? '<span class="image"><img src="' . $src . '" data-src="' . $src . '" data-name="media" alt="Selected Image" /></span>'
+					: ( $args['type'] === 'file'
+								? '<p class="file-name" data-name="media"><b>' . __('File Name') . '</b>: <span>' . $title . '</span></p>'
+								: null )
+		);
+		$no_value = sprintf(
+			'<div class="no-value hide">%s</div>',
+				$args['type'] === 'image'
+						? '<p>' . __('No image selected') . '</p><p><input type="button" id="locations_map-media-upload" class="button button-primary" value="Select Image" data-name="add"></p>'
+						: ( $args['type'] === 'file'
+									? '<p>' . __('No file selected', 'locations-maps') . '</p><p><input type="button" id="locations_map-media-upload" class="button button-primary" value="Select File" data-name="add"></p>'
+									: null )
+		);
+		printf(
+			'<div class="lm-media-container">%s</div>',
+	  $hidden . $has_value .$hover .$no_value
+		);
 		break;
 }
 
