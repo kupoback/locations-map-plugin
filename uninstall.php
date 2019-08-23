@@ -31,7 +31,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 }
 
 global $wpdb;
-$plugin_options = $wpdb->get_results( "SELECT option_name FROM $wpdb->options WHERE option_name LIKE 'locations_maps%'" );
+$plugin_options = $wpdb->get_results( "SELECT option_name FROM $wpdb->options WHERE option_name LIKE 'lm_options'" );
 $plugin_posts   = $wpdb->get_results( "SELECT option_name FROM $wpdb->posts WHERE post_type LIKE 'locations%'" );
 
 foreach ( $plugin_options as $option_field ) {
