@@ -205,14 +205,7 @@ class Locations_Maps_Metaboxes
 							
 							if ($type !== 'hidden')
 							{
-								printf(
-									'<div class="map-field map-%1$s %4$s"><div class="map-label"><label for="%1$s">%2$s</label></div><div class="map-%5$s">%3$s</div></div>',
-									$fid,
-									$title,
-									$markup,
-									$class,
-									$type,
-								);
+								printf('<div class="map-field map-%1$s %4$s"><div class="map-label"><label for="%1$s">%2$s</label></div><div class="map-%5$s">%3$s</div></div>', $fid, $title, $markup, $class, $type,);
 							}
 						}
 						?>

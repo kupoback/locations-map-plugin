@@ -11,7 +11,10 @@
  * @package Locations_Maps
  */
 
-$value = get_option($args['uid']) ?: $args['default'];
+$option = get_option('lm_options');
+$entry_value = isset($args['uid']) ? $args['uid'] : $args['default'];
+$value = isset($option[$entry_value]) ? $option[$entry_value] : $args['default'];
+$option_name = 'lm_options';
 
 $placeholder = isset($args['placeholder']) ? $args['placeholder'] : '';
 $helper      = isset($args['helper']) ? $args['helper'] : '';
@@ -28,7 +31,7 @@ switch ($args['type'])
 				// $i ++;
 				$options_markup .= sprintf(
 					'<label for="%1$s"><input id="%1$s" name="%1$s[]" type="%2$s" value="%3$s" %4$s /> %5$s</label><br/>',
-					$args['uid'],
+					"{$option_name}[{$args['uid']}]",
 					$args['type'],
 					$key,
 					isset($value[0]) ? checked($value[array_search($key, $value, true)], $key, false) : '',
@@ -44,7 +47,7 @@ switch ($args['type'])
 	case 'number':
 		printf(
 			'<input class="regular-text" name="%1$s" id="%1$s" type="%2$s" placeholder="%3$s" value="%4$s" autocomplete="off" aria-label="%5$s" />',
-			$args['uid'],
+			"{$option_name}[{$args['uid']}]",
 			$args['type'],
 			$placeholder,
 			$value,
@@ -53,7 +56,7 @@ switch ($args['type'])
 		break;
 	case 'textarea':
 		printf('<textarea class="regular-text" name="%1$s" id="%1$s" placeholder="%2$s" rows="5" cols="50">%3$s</textarea>',
-		       $args['uid'],
+		       "{$option_name}[{$args['uid']}]",
 		       $placeholder,
 		       $value
 		);
@@ -78,14 +81,14 @@ switch ($args['type'])
 			
 			printf(
 				'<select name="%1$s[]" id="%1$s" %2$s>%3$s</select>',
-				$args['uid'],
+				"{$option_name}[{$args['uid']}]",
 				$attributes,
 				$options_markup
 			);
 		}
 		break;
 	case 'wysiwyg' :
-	  wp_editor( $value, $args['uid'], $settings = ['textarea_rows'=> '10', 'media_buttons' => false] );
+	  wp_editor( $value, $args['uid'], $settings = ['textarea_name' => "{$option_name}[{$args['uid']}]", 'textarea_rows'=> '10', 'media_buttons' => false] );
 	  break;
 	case 'file' :
 	case 'image' :
@@ -96,10 +99,9 @@ switch ($args['type'])
 			$src              = is_array($image_attributes) && !empty($image_attributes) ? $image_attributes[0] : null;
 			$title            = get_the_title($value);
 		}
-		
 		$hidden = sprintf(
 			'<input type="hidden" name="%s" value="%s" data-name="hidden-media" />',
-				$args['uid'],
+			"{$option_name}[{$args['uid']}]",
 				$value
 		);
 		$hover = sprintf(

@@ -219,24 +219,36 @@ class Locations_Maps_Admin
 	{
 		
 		if (!empty($this->meta_fields))
-		// Run through each field array and register the setting
 		foreach ( (array) $this->meta_fields as $field)
 		{
-			add_settings_field($field['uid'],
+			/**
+			 * @param array                 $field      The passing array of fields you're registering
+			 * @param int|string|bool|array $id         The ID of your field
+			 * @param string                $title      The title of your field, used for labeling
+			 * @param callable              $callback   The function call back for adding the settings
+			 * @param callable              $page       The page this will live on
+			 * @param callable              $section    Which section of the options page this exists
+			 * @param array                 $args       An array of additional args for this field
+			 */
+			add_settings_field(
+				$field['uid'],
 				$field['title'],
-				[
-					$this,
-					'locations_maps_field_callback',
-				],
+				[ $this, 'locations_maps_field_callback' ],
 				'locations_maps_fields',
 				$field['section'],
 				$field
 			);
-			
-			register_setting('locations_maps_fields', $field['uid']);
-			
 		}
 		
+		register_setting('locations_maps_fields', 'lm_options', [$this, 'lm_options_validate']);
+		
+	}
+	
+	private function lm_options_validate($input) {
+		// Sanitize input or textarea input (strip html tags, and escape characters)
+		//$input['uid'] = wp_filter_nohtml_kses($field['uid']);
+		$input['google_api_key'] = wp_filter_nohtml_kses($input['google_api_key']);
+		return $input;
 	}
 	
 	/**

@@ -15,7 +15,7 @@ $meta_fields = [
 	],
 	*/
 	[
-		'uid'       => 'locations_maps_google_api_key',
+		'uid'       => 'google_api_key',
 		'title'     => 'Google Maps API Key',
 		'section'   => 'locations_maps_section_one',
 		'type'      => 'text',
@@ -23,44 +23,44 @@ $meta_fields = [
 		'helper'    => 'Please obtain an API key from <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank" rel="noopener">here</a>. Click on "Get Started" when landing on the page.',
 	],
 	[
-		'uid'       =>  'locations_maps_no_results_text',
+		'uid'       =>  'no_results_text',
 		'title'     =>  'No Results Text',
 		'section'   =>  'locations_maps_section_two',
 		'type'      =>  'wysiwyg',
 		'default'   =>  'No results found.',
 		'helper'    =>  ''
 	],
-	[
-		'uid'       => 'locations_maps_map_icon',
-		'title'     => 'Map Icon',
-		'section'   => 'locations_maps_section_one',
-		'type'      => 'image',
-		'default'   => '',
-	],
-	[
-		'uid'       => 'locations_map_map_style',
-		'title'     => 'Map Style',
-		'section'   => 'locations_maps_section_one',
-		'type'      => 'select',
-		'options'   => [
-			'none'      => 'Select',
-			'aubergine' => 'Aubergine',
-			'dark'      => 'Dark',
-			'night'     => 'Night',
-			'retro'     => 'Retro',
-			'silver'    => 'Silver',
-			'other'     => 'Other',
-		],
-		'default'   => [],
-	],
-	[
-		'uid'       => 'locations_maps_style_override',
-		'title'     => 'Map Style',
-		'section'   => 'locations_maps_section_one',
-		'type'      => 'file',
-		'helper'    => 'Please use JSON files only.',
-		'default'   => '',
-	],
+	// [
+	// 	'uid'       => 'locations_maps_map_icon',
+	// 	'title'     => 'Map Icon',
+	// 	'section'   => 'locations_maps_section_one',
+	// 	'type'      => 'image',
+	// 	'default'   => '',
+	// ],
+	// [
+	// 	'uid'       => 'locations_map_map_style',
+	// 	'title'     => 'Map Style',
+	// 	'section'   => 'locations_maps_section_one',
+	// 	'type'      => 'select',
+	// 	'options'   => [
+	// 		'none'      => 'Select',
+	// 		'aubergine' => 'Aubergine',
+	// 		'dark'      => 'Dark',
+	// 		'night'     => 'Night',
+	// 		'retro'     => 'Retro',
+	// 		'silver'    => 'Silver',
+	// 		'other'     => 'Other',
+	// 	],
+	// 	'default'   => [],
+	// ],
+	// [
+	// 	'uid'       => 'locations_maps_style_override',
+	// 	'title'     => 'Map Style',
+	// 	'section'   => 'locations_maps_section_one',
+	// 	'type'      => 'file',
+	// 	'helper'    => 'Please use JSON files only.',
+	// 	'default'   => '',
+	// ],
 ];
 
 return $meta_fields;
