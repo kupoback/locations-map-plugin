@@ -70,7 +70,7 @@ class Locations_Maps_Public
 		 * class.
 		 */
 		
-		wp_register_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/locations-maps-public.css', [], $this->version, 'all');
+		wp_register_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/locations-maps-public.min.css', [], $this->version, 'all');
 	}
 	
 	/**
@@ -160,7 +160,8 @@ class Locations_Maps_Public
 		$map_vars = [
 			'mapStyling'           => $map_style,
 			'mapZoom'              => $atts['zoom'],
-			'mapIcon'              => isset(get_option('lm_options')['map_icon']) ? get_option('lm_options')['map_icon'] : plugin_dir_url(__FILE__) . 'media/pin-circle.svg',
+			'mapIcon'              => lm_map_icon() ? wp_get_attachment_image_url(lm_map_icon()) : plugin_dir_url(__FILE__) . 'media/pin-circle.svg',
+			'circleIcon'           => plugin_dir_url(__FILE__) . 'media/pin-circle.svg'
 			// 'mapPopup'             => $atts['disable_popup'],
 			// 'mapDisableInfoWindow' => $atts['disabled_info'],
 		];
@@ -172,8 +173,8 @@ class Locations_Maps_Public
 			$map_vars['mapCenterLng'] = get_post_meta($atts['post_id'], '_map_lng', true);
 		}
 		else {
-			isset(get_option('lm_options')['center_lat']) ? $map_vars['mapCenterLat'] = get_option('lm_options')['center_lat'] : null;
-			isset(get_option('lm_options')['center_lng']) ? $map_vars['mapCenterLng'] = get_option('lm_options')['center_lng'] : null;
+			!is_null(lm_main_location()) && isset(lm_main_location()->lat) ? $map_vars['mapCenterLat'] = lm_main_location()->lat : null;
+			!is_null(lm_main_location()) && isset(lm_main_location()->lng) ? $map_vars['mapCenterLng'] = lm_main_location()->lng : null;
 		}
 		
 		// wp_localize_script($this->plugin_name, 'MAP_VARS', $map_vars);

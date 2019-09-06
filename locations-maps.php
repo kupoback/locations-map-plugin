@@ -16,7 +16,7 @@
  * Plugin Name:       Locations
  * Plugin URI:        #
  * Description:       This plugin incorporates Google Maps in the sense of pulling information needed for locations.
- * Version:           1.1.0
+ * Version:           1.2.0
  * Author:            Nick Makris
  * Author URI:        https://makris.io
  * License:           GPL-2.0+
@@ -35,7 +35,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.1.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'LOCATIONS_MAPS_VERSION', '1.1.0' );
+define( 'LOCATIONS_MAPS_VERSION', '1.2.0' );
 define( 'LOCATIONS_MAPS_PLUGIN_PATH', plugin_dir_path(__FILE__) );
 /**
  * The code that runs during plugin activation.

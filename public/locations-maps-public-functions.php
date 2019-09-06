@@ -20,6 +20,13 @@ function lm_google_api_key()
 	return !is_null($get_key) ? sanitize_text_field($get_key) : '';
 }
 
+function lm_google_geocode_api_key()
+{
+	$options =  get_option('lm_options');
+	$get_key = isset( $options['google_geocode_api_key']) ? $options['google_geocode_api_key'] : null;
+	return !is_null($get_key) ? sanitize_text_field($get_key) : '';
+}
+
 /**
  * Returns the ID of the set Map Icon
  *
@@ -54,3 +61,15 @@ function lm_no_results()
 	return isset($options['no_results_text']) ? apply_filters( 'the_content', $options['no_results_text'] ) : '';
 }
 
+/**
+ * Returns the lat and lng values
+ *
+ * @return null|object
+ */
+function lm_main_location() {
+	$loc = [];
+	isset(get_option('_main_location')['lat']) ? $loc['lat'] = get_option('_main_location')['lat'] : null;
+	isset(get_option('_main_location')['lng']) ? $loc['lng'] = get_option('_main_location')['lng'] : null;
+	
+	return $loc ? (object) $loc : null;
+}

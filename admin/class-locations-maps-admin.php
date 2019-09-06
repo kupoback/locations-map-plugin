@@ -84,7 +84,7 @@ class Locations_Maps_Admin
 		 * class.
 		 */
 		
-		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/locations-maps-admin.css', [], $this->version, 'all');
+		wp_enqueue_style($this->plugin_name, plugin_dir_url(__FILE__) . 'css/locations-maps-admin.min.css', [], $this->version, 'all');
 		
 	}
 	
@@ -108,13 +108,13 @@ class Locations_Maps_Admin
 		 * class.
 		 */
 		
-		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/locations-maps-admin.js', ['jquery'], $this->version, true);
+		wp_enqueue_script($this->plugin_name, plugin_dir_url(__FILE__) . 'js/locations-maps-admin.min.js', ['jquery'], $this->version, true);
 		
 		$screen = get_current_screen();
 		if ((is_object($screen) || is_array($screen)) && $screen->id === 'locations_page_location-maps-settings')
 		{
 			wp_enqueue_media();
-			wp_enqueue_script($this->plugin_name . '-settings', plugin_dir_url(__FILE__) . 'js/location-maps-settings.js', ['jquery'], $this->version, true);
+			wp_enqueue_script($this->plugin_name . '-settings', plugin_dir_url(__FILE__) . 'js/location-maps-settings.min.js', ['jquery'], $this->version, true);
 		}
 		
 		if (is_object($screen) && $screen->id === 'locations')
@@ -190,7 +190,7 @@ class Locations_Maps_Admin
 					'locations_maps_section_callback',
 				],
 				'function' => 'locations_maps_fields',
-			],
+			]
 		];
 		// Run through each section and register them
 		foreach ($sections as $section)
@@ -248,6 +248,7 @@ class Locations_Maps_Admin
 		// Sanitize input or textarea input (strip html tags, and escape characters)
 		//$input['uid'] = wp_filter_nohtml_kses($field['uid']);
 		$input['google_api_key'] = wp_filter_nohtml_kses($input['google_api_key']);
+		$input['google_geocode_api_key'] = wp_filter_nohtml_kses($input['google_geocode_api_key']);
 		return $input;
 	}
 	

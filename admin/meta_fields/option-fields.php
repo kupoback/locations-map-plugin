@@ -23,6 +23,14 @@ $meta_fields = [
 		'helper'    => 'Please obtain an API key from <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank" rel="noopener">here</a>. Click on "Get Started" when landing on the page.',
 	],
 	[
+		'uid'       => 'google_geocode_api_key',
+		'title'     => 'Google Maps GeoCode API Key',
+		'section'   => 'locations_maps_section_one',
+		'type'      => 'text',
+		'default'   => '',
+		'helper'    => 'Please obtain an API key from <a href="https://developers.google.com/maps/documentation/javascript/get-api-key" target="_blank" rel="noopener">here</a>. Click on "Get Started" when landing on the page.',
+	],
+	[
 		'uid'       =>  'no_results_text',
 		'title'     =>  'No Results Text',
 		'section'   =>  'locations_maps_section_two',
@@ -30,13 +38,13 @@ $meta_fields = [
 		'default'   =>  'No results found.',
 		'helper'    =>  ''
 	],
-	// [
-	// 	'uid'       => 'map_icon',
-	// 	'title'     => 'Map Icon',
-	// 	'section'   => 'locations_maps_section_one',
-	// 	'type'      => 'image',
-	// 	'default'   => '',
-	// ],
+	[
+		'uid'       => 'map_icon',
+		'title'     => 'Map Icon',
+		'section'   => 'locations_maps_section_one',
+		'type'      => 'image',
+		'default'   => '',
+	],
 	// [
 	// 	'uid'       => 'map_style',
 	// 	'title'     => 'Map Style',

@@ -205,7 +205,7 @@ class Locations_Maps_Metaboxes
 							
 							if ($type !== 'hidden')
 							{
-								printf('<div class="map-field map-%1$s %4$s"><div class="map-label"><label for="%1$s">%2$s</label></div><div class="map-%5$s">%3$s</div></div>', $fid, $title, $markup, $class, $type,);
+								printf('<div class="map-field map-%1$s %4$s"><div class="map-label"><label for="%1$s">%2$s</label></div><div class="map-%5$s">%3$s</div></div>', $fid, $title, $markup, $class, $type);
 							}
 						}
 						?>
@@ -220,7 +220,6 @@ class Locations_Maps_Metaboxes
 								<input type="button" name="geo_reset" class="btn" id="geo_reset" value="<?php _e('Reset Geo Location'); ?>" />
 								<input type="button" name="form-reset" class="btn" id="form-reset" value="<?php _e('Form Reset'); ?>" />
 							</div>
-							<input type="hidden" id="map_api_key" value="<?php echo isset(get_option('lm_options')['google_api_key']) ? get_option('lm_options')['google_api_key'] : null; ?>" />
 				      <?php foreach ($hidden as $hid) { echo $hid; } ?>
 						</div>
 					</div>

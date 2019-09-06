@@ -196,10 +196,7 @@ class Locations_Maps {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-locations-maps-metaboxes.php';
 		
-		/**
-		 * The class extending the REST_API
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-locations-maps-api.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-locations-maps-admin-api.php';
 		
 		/**
 		 * This class allows for a use of get_template_part in the theme
@@ -216,6 +213,11 @@ class Locations_Maps {
 		 * side of the site.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-locations-maps-public.php';
+		
+		/**
+		 * The class responsible for building the API
+		 */
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-locations-maps-api.php';
 		
 		/**
 		 * The class responsible for defining all accessible functions.
@@ -269,8 +271,10 @@ class Locations_Maps {
 		$this->loader->add_action( 'wp_ajax_nopriv_geo_cb', $plugin_mb, 'locations_maps_metabox_ajax');
 		$this->loader->add_action( 'wp_ajax_geo_cb', $plugin_mb, 'locations_maps_metabox_ajax');
 		$this->loader->add_action( 'rest_api_init', $plugin_mb, 'locations_maps_add_custom_fields');
-//		$this->loader->add_action( 'post_submitbox_misc_actions', $plugin_mb, 'locations_maps_update_box_custom_fields');
+		// $this->loader->add_action( 'post_submitbox_misc_actions', $plugin_mb, 'locations_maps_update_box_custom_fields');
 	
+		$plugin_api = new Locations_Maps_Admin_API($this->get_plugin_name(), $this->get_version());
+		$this->loader->add_action('rest_api_init', $plugin_api, 'register_routes');
 	
 	}
 
@@ -284,6 +288,9 @@ class Locations_Maps {
 	private function define_public_hooks() {
 
 		$plugin_public = new Locations_Maps_Public( $this->get_plugin_name(), $this->get_version() );
+		
+		$plugin_locations_api = new Locations_Maps_API($this->get_plugin_name(), $this->get_version() );
+		$this->loader->add_action('rest_api_init', $plugin_locations_api, 'register_routes');
 
 		// $this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		// $this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );

@@ -100,7 +100,7 @@ class Locations_Maps_Custom_Post_Type
 			'public'                => true,
 			'show_ui'               => true,
 			'show_in_menu'          => true,
-			'menu_position'         => 5,
+			'menu_position'         => 25,
 			'menu_icon'             => 'dashicons-building',
 			'show_in_admin_bar'     => true,
 			'show_in_nav_menus'     => false,
