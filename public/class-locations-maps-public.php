@@ -134,7 +134,7 @@ class Locations_Maps_Public
 		$templates = new LM_Template_Loader;
 		
 		wp_enqueue_style($this->plugin_name);
-		// wp_enqueue_script($this->plugin_name);
+		wp_enqueue_script($this->plugin_name);
 		wp_enqueue_script($this->plugin_name . '-google-maps');
 		
 		$map_style = plugin_dir_url(__FILE__) . 'map-styles/primarykitchen.json';
@@ -154,16 +154,16 @@ class Locations_Maps_Public
 		
 		global $map_atts;
 		
-		// $atts['disable_popup'] !== 'false' ? $atts['disable_popup'] = 'disable' : null;
-		// $atts['disabled_info'] !== 'false' ? $atts['disabled_info'] = 'disable' : null;
+		$atts['disable_popup'] !== 'false' ? $atts['disable_popup'] = 'disable' : null;
+		$atts['disabled_info'] !== 'false' ? $atts['disabled_info'] = 'disable' : null;
 		
 		$map_vars = [
 			'mapStyling'           => $map_style,
 			'mapZoom'              => $atts['zoom'],
 			'mapIcon'              => lm_map_icon() ? wp_get_attachment_image_url(lm_map_icon()) : plugin_dir_url(__FILE__) . 'media/pin-circle.svg',
-			'circleIcon'           => plugin_dir_url(__FILE__) . 'media/pin-circle.svg'
-			// 'mapPopup'             => $atts['disable_popup'],
-			// 'mapDisableInfoWindow' => $atts['disabled_info'],
+			'circleIcon'           => plugin_dir_url(__FILE__) . 'media/pin-circle.svg',
+			'mapPopup'             => $atts['disable_popup'],
+			'mapDisableInfoWindow' => $atts['disabled_info']
 		];
 		
 		if ( !is_null($atts['post_id'] ))

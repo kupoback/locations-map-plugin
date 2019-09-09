@@ -271,7 +271,7 @@ class Locations_Maps {
 		$this->loader->add_action( 'wp_ajax_nopriv_geo_cb', $plugin_mb, 'locations_maps_metabox_ajax');
 		$this->loader->add_action( 'wp_ajax_geo_cb', $plugin_mb, 'locations_maps_metabox_ajax');
 		$this->loader->add_action( 'rest_api_init', $plugin_mb, 'locations_maps_add_custom_fields');
-		// $this->loader->add_action( 'post_submitbox_misc_actions', $plugin_mb, 'locations_maps_update_box_custom_fields');
+		$this->loader->add_action( 'post_submitbox_misc_actions', $plugin_mb, 'locations_maps_update_box_custom_fields');
 	
 		$plugin_api = new Locations_Maps_Admin_API($this->get_plugin_name(), $this->get_version());
 		$this->loader->add_action('rest_api_init', $plugin_api, 'register_routes');

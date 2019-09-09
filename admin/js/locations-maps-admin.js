@@ -1,43 +1,50 @@
 (function ($) {
   'use strict';
   
+  let lat = $('[data-lat]');
+  let lng = $('[data-lng]');
+  let address = $('[data-address]');
+  let address2 = $('[data-address2]');
+  let city = $('[data-city]');
+  let state = $('[data-state]');
+  let zip = $('[data-zip]');
+  let country = $('[data-country]');
+  let email = $('[data-email]');
+  let phone = $('[data-phone]');
+  let website = $('[data-website]');
+  let placeID = $('[data-placeid]');
+  let textLat = $('[data-lat_text]');
+  let textLng = $('[data-lng_text]');
+  
   function pageLoadSetLatLng() {
-    let lat = document.getElementById('_map_lat').value;
-    let lng = document.getElementById('_map_lng').value;
+    textLat.val(lat.val());
+    textLng.val(lng.val());
   }
   
   function mapGeoLocate() {
     $('#get_geoloc').on('click', function () {
       
-      let address = $('#_map_address').val() || '';
-      let address2 = $('#_map_address2').val() || '';
-      let city = $('#_map_city').val() || '';
-      let state = $('#_map_state').val() || '';
-      let zip = $('#_map_zip').val() || '';
-      let country = $('#_map_country').val() || '';
-      let phone = $('#_map_phone').val() || '';
-      let website = $('#_map_website').val() || '';
-      //var placeID = $( "#_map_placeID" ).val() || "";
-  
       let paramAddress = {
-        address : address,
-        address2: address2,
-        city: city,
-        state: state,
-        zip: zip,
-        country: country
+        address:  address.val(),
+        address2: address2.val(),
+        city:     city.val(),
+        state:    state.val(),
+        zip:      zip.val(),
+        country:  country.val()
       };
-  
+      
+      console.log(paramAddress);
+      
       $('#map-loading').addClass('show');
       $('.map-row').addClass('loading');
       $('.map-field input, .map-field.disabled input').prop('readonly', true);
-  
+      
       // Start Ajax Build
       $.ajax({
         url:      '/wp-json/locations/v1/place/',
         method:   'GET',
-        data : {
-          address : paramAddress
+        data:     {
+          address: paramAddress
         },
         complete: function () {
           $('#map-loading').removeClass('show');
@@ -46,37 +53,41 @@
         },
         success:  function (data) {
           
+          if (!data)
+            return;
+          
           let lat = parseFloat(data.lat);
           let lng = parseFloat(data.lng);
-          // var placeID = data.results[0].place_id;
+          placeID = data.place_id;
           
-          document.getElementById('lat_text').value = lat;
-          document.getElementById('lng_text').value = lng;
-          document.getElementById('_map_lat').value = lat;
-          document.getElementById('_map_lng').value = lng;
-          // document.getElementById( "_map_placeID" ).value = placeID;
+          console.log(data);
           
-          console.log(lat);
+          document.getElementById('lm_meta[lat_text]').value = lat;
+          document.getElementById('lm_meta[lng_text]').value = lng;
+          document.getElementById('lm_meta[lat]').value = lat;
+          document.getElementById('lm_meta[lng]').value = lng;
+          document.getElementById('lm_meta[placeID]').value = placeID;
+          
           let returnData = {
             _ajax_nonce: MAP_ADMIN.nonce,
             action:      'geo_cb',
-            address:     address,
-            address2:    address2,
-            city:        city,
-            state:       state,
-            zip:         zip,
-            // country:     country,
-            lat:         lat,
-            lng:         lng,
-            phone:       phone,
-            website:     website,
-            // "placeID":   placeID,
+            address:     address.val() || '',
+            address2:    address2.val() || '',
+            city:        city.val() || '',
+            state:       state.val() || '',
+            zip:         zip.val() || '',
+            country:     country.val() || '',
+            phone:       phone.val() || '',
+            website:     website.val() || '',
+            placeID:     placeID || '',
+            lat:         lat || '',
+            lng:         lng || '',
             id:          $('#get_geoloc').data('postid')
           };
           
-          $.post(MAP_ADMIN.adminURL, returnData, function (msg) {
-            alert('Address and Place Saved! Please be sure to hit Update if you made any other content changes.');
-          });
+          // $.post(MAP_ADMIN.adminURL, returnData, function (msg) {
+          //   alert('Address and Place Saved! Please be sure to hit Update if you made any other content changes.');
+          // });
           
         },
         error:    function (data) {
@@ -90,36 +101,25 @@
   function mapAddressSave() {
     $('#save_address').on('click', function () {
       
-      let address = document.getElementById('_map_address').value || '';
-      let address2 = document.getElementById('_map_address2').value || '';
-      let city = document.getElementById('_map_city').value || '';
-      let state = document.getElementById('_map_state').value || '';
-      let zip = document.getElementById('_map_zip').value || '';
-      // let country = document.getElementById('_map_country').value || '';
-      let lat = document.getElementById('_map_lat').value || '';
-      let lng = document.getElementById('_map_lng').value || '';
-      let phone = document.getElementById('_map_phone').value || '';
-      let email = document.getElementById('_map_email').value || '';
-      let website = document.getElementById('_map_website').value || '';
-      //let placeID = document.getElementById( "_map_placeID" ).value || "";
-      
       let returnData = {
         _ajax_nonce: MAP_ADMIN.nonce,
         action:      'geo_cb',
-        address:     address || '',
-        address2:    address2 || '',
-        city:        city || '',
-        state:       state || '',
-        zip:         zip || '',
-        // country:     country || '',
-        lat:         lat || '',
-        lng:         lng || '',
-        // "placeID":   placeID || "",
-        email:       email || '',
-        phone:       phone || '',
-        website:     website || '',
-        id:          $('#get_geoloc').data('postid')
+        address:     address.val() || '',
+        address2:    address2.val() || '',
+        city:        city.val() || '',
+        state:       state.val() || '',
+        zip:         zip.val() || '',
+        lat:         lat.val() || '',
+        lng:         lng.val() || '',
+        email:       email.val() || '',
+        phone:       phone.val() || '',
+        website:     website.val() || '',
+        id:          $('#get_geoloc').data('postid'),
+        // country:     country.val() || '',
+        placeID:     placeID.val() || ''
       };
+      
+      console.log(returnData);
       
       $.post(MAP_ADMIN.adminURL, returnData, function (msg) {
         alert('Address saved. If you haven\'t already, click "Get Place" to get the Place Informtaion.');
@@ -131,36 +131,30 @@
   function mapGeoLocateReset() {
     $('#geo_reset').on('click', function () {
       
-      let address = document.getElementById('_map_address').value || '';
-      let address2 = document.getElementById('_map_address2').value || '';
-      let city = document.getElementById('_map_city').value || '';
-      let state = document.getElementById('_map_state').value || '';
-      let zip = document.getElementById('_map_zip').value || '';
-      // let country = document.getElementById( "_map_country" ).value || "";
-      let phone = document.getElementById('_map_phone').value || '';
-      let website = document.getElementById('_map_website').value || '';
+      if (!confirm('Are you sure you want to reset the geolocation?'))
+        return;
       
-      document.getElementById('lat_text').value = '';
-      document.getElementById('lng_text').value = '';
-      document.getElementById('_map_lat').value = '';
-      document.getElementById('_map_lng').value = '';
-      // document.getElementById( "_map_placeID" ).value = "";
+      document.getElementById('lm_meta[lat_text]').value = '';
+      document.getElementById('lm_meta[lng_text]').value = '';
+      document.getElementById('lm_meta[lat]').value = '';
+      document.getElementById('lm_meta[lng]').value = '';
+      document.getElementById('lm_meta[placeID]').value = '';
       
       let returnData = {
         _ajax_nonce: MAP_ADMIN.nonce,
         action:      'geo_cb',
-        address:     address || '',
-        address2:    address2 || '',
-        city:        city || '',
-        state:       state || '',
-        zip:         zip || '',
-        // country:     country || '',
+        address:     address.val() || '',
+        address2:    address2.val() || '',
+        city:        city.val() || '',
+        state:       state.val() || '',
+        zip:         zip.val() || '',
         lat:         '',
         lng:         '',
-        // "placeID":   placeID || "",
-        phone:       phone || '',
-        website:     website || '',
+        phone:       phone.val() || '',
+        website:     website.val() || '',
         id:          $('#get_geoloc').data('postid')
+        // country:     country.val() || '',
+        // placeID:     placeID.val() || '',
       };
       
       $.post(MAP_ADMIN.adminURL, returnData, function (msg) {
@@ -205,6 +199,9 @@
   function mapFormReset() {
     $('#form-reset').on('click', function () {
       
+      if (!confirm('Are you sure you want to reset the form? This is unreversable.'))
+        return;
+      
       mapClearChildren(document.getElementById('map-elements'));
       
       let returnData = {
@@ -234,15 +231,15 @@
   function mapAPICheck() {
     $('#get_geoloc').on('click', function () {
       
-      let address = $('#_map_address').val() || '';
-      let address2 = $('#_map_address2').val() || '';
-      let city = $('#_map_city').val() || '';
-      let state = $('#_map_state').val() || '';
-      let zip = $('#_map_zip').val() || '';
-      let country = $('#_map_country').val() || '';
-      let phone = $('#_map_phone').val() || '';
-      let website = $('#_map_website').val() || '';
-      //var placeID = $( "#_map_placeID" ).val() || "";
+      let address = $('[data-address]').val() || '';
+      let address2 = $('[data-address2]').val() || '';
+      let city = $('[data-city]').val() || '';
+      let state = $('[data-state]').val() || '';
+      let zip = $('[data-zip]').val() || '';
+      let country = $('[data-country]').val() || '';
+      let phone = $('[data-phone]').val() || '';
+      let website = $('[data-website]').val() || '';
+      //var placeID = $( "[data-placeID]" ).val() || "";
       
       // let addressInput = address !== '' ? address.replace(/\s/g, '+') + ',+' : '';
       // let cityInput = city !== '' ? city.replace(/\s/g, '+') + ',+' : '';
@@ -259,24 +256,24 @@
       
       
       let paramAddress = {
-        address : address,
+        address:  address,
         address2: address2,
-        city: city,
-        state: state,
-        zip: zip,
-        country: country
+        city:     city,
+        state:    state,
+        zip:      zip,
+        country:  country
       };
       
       $('#map-loading').addClass('show');
       $('.map-row').addClass('loading');
       $('.map-field input, .map-field.disabled input').prop('readonly', true);
-  
+      
       // Start Ajax Build
       $.ajax({
         url:      '/wp-json/locations/v1/place/',
         method:   'GET',
-        data : {
-          address : paramAddress
+        data:     {
+          address: paramAddress
         },
         // dataType: 'json',
         complete: function () {
@@ -295,10 +292,11 @@
   }
   
   if ($('body').hasClass('post-type-locations')) {
+    pageLoadSetLatLng();
     mapGeoLocate();
-    // mapAddressSave();
+    mapAddressSave();
     mapGeoLocateReset();
-    // mapFormReset();
+    mapFormReset();
     // mapAPICheck();
   }
   

@@ -147,13 +147,13 @@ class Locations_Maps_Admin_API
 					if (!property_exists($body, 'error_message') && isset($body->results) && count($body->results) > 0)
 					{
 						
-						$lat = $body->results[0]->geometry->location->lat ?: null;
-						$lng = $body->results[0]->geometry->location->lng ?: null;
+						property_exists( $body->results[0]->geometry, 'location' ) ?
+							$coords = (object) [
+								'lat' => $body->results[0]->geometry->location->lat ? (float) $body->results[0]->geometry->location->lat : null,
+								'lng' => $body->results[0]->geometry->location->lng ? (float) $body->results[0]->geometry->location->lng : null,
+								'place_id' => property_exists($body->results[0], 'place_id') ? $body->results[0]->place_id : null
+								] : null;
 						
-						$coords = (object) [
-							'lat' => !is_null($lat) ? (float) $lat : null,
-							'lng' => !is_null($lng) ? (float) $lng : null,
-						];
 					}
 					else
 					{
