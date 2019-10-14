@@ -1,4 +1,5 @@
 <?php
+
 $meta_fields = [
 	// @TODO Integrate with the site
 	/*
@@ -44,6 +45,14 @@ $meta_fields = [
 		'section'   => 'locations_maps_section_one',
 		'type'      => 'image',
 		'default'   => '',
+	],
+	[
+		'uid'       => 'enqueued_script',
+		'title'     => 'Script Hook Name',
+		'section'   => 'locations_maps_section_one',
+		'type'      => 'text',
+		'default'   => '',
+		'helper'    => 'This is the script that this plugin show user to localize the API variables.'
 	],
 	// [
 	// 	'uid'       => 'map_style',

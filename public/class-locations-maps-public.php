@@ -114,56 +114,34 @@ class Locations_Maps_Public
 	}
 	
 	/**
-	 * Function: map_module_short_code
-	 * Description:
-	 * Version: 1.0
-	 * Author: Nick Makris @kupoback
-	 * Author URI: https://makris.io
+	 * Our map shortcode which will display a google map to the page.
 	 *
-	 * @param $atts
-	 * @shortcode [map map_id="" zoom="15"]
+	 * @param array $atts   map_id = an ID used to identify the map, can allow for multiple calls of the shortcode, granted a different ID is used
+	 *                      post_id = allows for returning of a single location
+	 *                      zoom = Allows for the adjustment of the zoom level
+	 * @shortcode [map map_id="" zoom="8"]
 	 *
 	 * @return
-	 *
-	 * @package MDH
-	 *
+	 * @since 1.0.0
 	 */
 	public function map_module_short_code($atts)
 	{
-		
-		$templates = new LM_Template_Loader;
-		
-		wp_enqueue_style($this->plugin_name);
-		wp_enqueue_script($this->plugin_name);
-		wp_enqueue_script($this->plugin_name . '-google-maps');
-		
-		$map_style = plugin_dir_url(__FILE__) . 'map-styles/primarykitchen.json';
-		
 		// Attributes
 		$atts = shortcode_atts(
 			[
 				// Our Short code parameters
-				'map_id'        => 'lm_map',
-				'post_id'       => null,
-				'zoom'          => 8,
-				// 'disable_popup' => 'false',
-				// 'disabled_info' => 'false',
+				'map_id'  => 'lm_map',
+				'post_id' => null,
+				'zoom'    => 8,
 			],
 			$atts
 		);
 		
-		global $map_atts;
-		
-		$atts['disable_popup'] !== 'false' ? $atts['disable_popup'] = 'disable' : null;
-		$atts['disabled_info'] !== 'false' ? $atts['disabled_info'] = 'disable' : null;
-		
+		// Starting to setup our localzie array
 		$map_vars = [
-			'mapStyling'           => $map_style,
-			'mapZoom'              => $atts['zoom'],
-			'mapIcon'              => lm_map_icon() ? wp_get_attachment_image_url(lm_map_icon()) : plugin_dir_url(__FILE__) . 'media/pin-circle.svg',
-			'circleIcon'           => plugin_dir_url(__FILE__) . 'media/pin-circle.svg',
-			'mapPopup'             => $atts['disable_popup'],
-			'mapDisableInfoWindow' => $atts['disabled_info']
+			'mapStyling' => lm_map_style() ?: plugin_dir_url(__FILE__) . 'map-styles/dark.json',
+			'mapZoom'    => $atts['zoom'],
+			'mapIcon'    => lm_map_icon() ? wp_get_attachment_image_url(lm_map_icon()) : plugin_dir_url(__FILE__) . 'media/pin-circle.svg',
 		];
 		
 		if ( !is_null($atts['post_id'] ))
@@ -177,14 +155,14 @@ class Locations_Maps_Public
 			!is_null(lm_main_location()) && isset(lm_main_location()->lng) ? $map_vars['mapCenterLng'] = lm_main_location()->lng : null;
 		}
 		
-		// wp_localize_script($this->plugin_name, 'MAP_VARS', $map_vars);
-		wp_localize_script('sage/main.js', 'MAP_VARS', $map_vars);
 		
-		$map_atts['map_id'] = $atts['map_id'];
+		wp_enqueue_style($this->plugin_name);
+		// wp_enqueue_script($this->plugin_name . '-google-maps');
+		isset(get_option('lm_options')['enqueued_script']) ? wp_localize_script( get_option('lm_options')['enqueued_script'], 'MAP_VARS', $map_vars) : null;
 		
 		// Templates will be loaded here
 		ob_start();
-		$templates->get_template_part('lm', 'map');
+		printf('<div id="%s" class="map-container"></div>', $atts['map_id']);
 		wp_reset_postdata();
 		
 		return ob_get_clean();
@@ -194,23 +172,30 @@ class Locations_Maps_Public
 	 * Function Name: location_short_code
 	 * Description: Post Template Part displaying data from Locations Post Type. Contains overridable template
 	 *
-	 * @param $atts
+	 * @param array $atts   post_ids = a string of post ID's to show, must be comma delimted
+	 *                      order = Change the ordering of the posts
+	 *                      orderby = Change the orderby of the posts
+	 *                      template = the template to return, must have full slug
+	 *
+	 * @shortcode [location post_ids="" order="" orderby="" template=""]
 	 *
 	 * @return false|string
+	 * @since 1.2.0
 	 */
 	public function location_short_code($atts)
 	{
 		
-		$templates = new LM_Template_Loader;
-		
 		$atts = shortcode_atts(
 			[
-				'post_ids' => [],
+				'post_ids' => '',
 				'order'    => 'ASC',
 				'orderby'  => 'menu_order',
+				'template' => null
 			],
 			$atts
 		);
+		// Exit if no template degined
+		if ( $atts['template'] === null ) { return; }
 		
 		$args = [
 			'post_type'      => 'locations',
@@ -219,17 +204,15 @@ class Locations_Maps_Public
 			'orderby'        => $atts['orderby'],
 		];
 		
-		isset($atts['post_ids']) && is_string($atts['post_ids']) ? $args['post__in'] = explode(',', $atts['post_ids']) : null;
+		isset($atts['post_ids']) && is_string($atts['post_ids']) ? $args['post__in'] = $atts['post_ids'] : null;
 		
 		$loop = new WP_Query($args);
 		
 		ob_start();
 		if ($loop->have_posts()) :
 			while ($loop->have_posts()) : $loop->the_post();
-				$templates->get_template_part('lm', 'locations');
+				get_template_part($atts['template']);
 			endwhile;
-		else :
-			$templates->get_template_part('lm', 'none');
 		endif;
 		wp_reset_postdata();
 		

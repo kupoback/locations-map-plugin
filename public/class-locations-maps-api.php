@@ -1,7 +1,13 @@
 <?php
 
 //Exit if accessed directly
-if (!defined('ABSPATH')) exit;
+if (!defined('ABSPATH'))
+	exit;
+
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Client;
+
+require_once plugin_dir_path(dirname(__FILE__)) . 'vendor/autoload.php';
 
 /**
  * Class Name: Locations_Maps_API
@@ -55,15 +61,6 @@ class Locations_Maps_API
 	private $apiKey;
 	
 	/**
-	 * The libraries for loaded for google
-	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string $libraries The libraries loaded for Google Maps
-	 */
-	private $libraries;
-	
-	/**
 	 *
 	 * The address to gather data from
 	 *
@@ -73,6 +70,25 @@ class Locations_Maps_API
 	 */
 	private $address;
 	
+	/**
+	 * The client call
+	 *
+	 * @var
+	 */
+	private $client;
+	
+	/**
+	 * The error message for REST API
+	 *
+	 * @var array
+	 */
+	private $error;
+	
+	/**
+	 * Namespace of our Endpoint
+	 *
+	 * @var string
+	 */
 	protected $namespace;
 	
 	/**
@@ -86,17 +102,29 @@ class Locations_Maps_API
 	 */
 	public function __construct($plugin_name, $version)
 	{
+		$options = get_option('lm_options');
+		$get_key = isset($options['google_geocode_api_key']) ? $options['google_geocode_api_key'] : null;
+		
 		$this->namespace      = 'locations/v1';
 		$this->plugin_name    = $plugin_name;
 		$this->version        = $version;
-		$this->google_api_url = 'https://maps.googleapis.com/maps/api/geocode/json?';
+		$this->google_api_url = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
 		$this->address        = 'address=';
-		$this->libraries      = '&libraries=geometry';
-		$this->apiKey         = lm_google_geocode_api_key();
+		$this->apiKey         = !is_null($get_key) ? sanitize_text_field($get_key) : '';
+		$this->client         = new Client(['verify' => false]);
+		$this->error          = new WP_Error('error_cannot_access', "The route request is inaccessible or missing data", ["status" => 404]);
 	}
 	
+	/**
+	 * Registration of our custom endpoints
+	 *
+	 * @since 1.3.0
+	 */
 	public function register_routes()
 	{
+		/**
+		 * Our locations listing
+		 */
 		register_rest_route($this->namespace, '/places', [
 			'methods'  => WP_REST_Server::READABLE,
 			'callback' => [
@@ -106,8 +134,11 @@ class Locations_Maps_API
 			'args'     => [],
 		]);
 		
+		/**
+		 * Our nearby endpoing
+		 */
 		register_rest_route($this->namespace, '/nearby', [
-			'methods'  => \WP_REST_Server::READABLE,
+			'methods'  => WP_REST_Server::READABLE,
 			'callback' => [
 				$this,
 				'get_nearby_locations',
@@ -129,8 +160,20 @@ class Locations_Maps_API
 		]);
 	}
 	
-	private function get_posts($tax_terms = [])
+	/**
+	 * A private function used to get the posts from our custom post type
+	 *
+	 * @param array $tax_terms Allows for the addition of taxonomy terms
+	 * @param array $add_args  If we need any additional arguments
+	 *
+	 * @return int[]|WP_Post[]
+	 * @since 1.3.0
+	 */
+	private function get_posts($tax_terms = [], $add_args = [])
 	{
+		/**
+		 * Default setup of arguments
+		 */
 		$args = [
 			'post_type'       => 'locations',
 			'posts_per_parge' => - 1,
@@ -140,6 +183,9 @@ class Locations_Maps_API
 			'hide_empty'      => true,
 		];
 		
+		/**
+		 * Checks to see if we need to do a taxonomy query
+		 */
 		if (isset($tax_terms) && !empty($tax_terms) && is_array($tax_terms))
 		{
 			$terms_query = [];
@@ -155,21 +201,48 @@ class Locations_Maps_API
 			$args['tax_query'] = $terms_query;
 		}
 		
-		$query = get_posts($args);
+		/**
+		 * Run through our additional args array
+		 * This assumes that the args is a key driven array
+		 * and not a int based array
+		 */
+		if (!empty($add_args) && is_array($add_args))
+		{
+			foreach ($add_args as $key => $arg)
+			{
+				!is_int($key) ? array_push($args, [$key => $arg]) : null;
+			}
+		}
 		
-		return $query;
+		/**
+		 * Return our query with get_posts so no need to disrupt the
+		 * query of other methods
+		 */
+		return $query = get_posts($args);
 	}
 	
+	/**
+	 * Our function returns a JSON response of all the locations in our custom post type
+	 *
+	 * @return mixed|WP_REST_Response
+	 * @since 1.3.0
+	 */
 	public function get_locations()
 	{
+		$locations = [];
 		
+		// Sets the return text if there are no locations
 		$no_posts_text = get_field('no_locations_text', 'option') ?: 'No Locations Found';
-		$locations     = [];
-		$posts         = $this->get_posts();
+		// Our return query
+		$posts = $this->get_posts();
 		
+		/**
+		 * Run through our $posts array and setup our export data
+		 */
 		if (!empty($posts))
 		{
 			$i = 0;
+			// Allows us to setup_postdata
 			global $post;
 			foreach ($posts as $post)
 			{
@@ -185,6 +258,7 @@ class Locations_Maps_API
 						'city'     => get_post_meta($post_id, '_map_city', true) ?: null,
 						'state'    => get_post_meta($post_id, '_map_state', true) ?: null,
 						'zip'      => get_post_meta($post_id, '_map_zip', true) ?: null,
+						'return'   => $this->address($post_id),
 					],
 					'phone'   => get_post_meta($post_id, '_map_phone', true) ?
 						[
@@ -199,196 +273,241 @@ class Locations_Maps_API
 				
 				$i ++;
 			}
-			wp_reset_postdata();
+			wp_reset_postdata(); // Ensure we reset this in case there's an extension of functions added to this endpoint
 		}
 		
-		if (empty($locations))
-		{
-			$locations['no_posts_found'] = $no_posts_text;
-		}
+		/**
+		 * Change our return to no_posts_found if the $locations array is empty
+		 */
+		empty($locations) ? $locations['no_posts_found'] = $no_posts_text : null;
 		
 		return rest_ensure_response($locations);
 	}
 	
+	/**
+	 * Returns a JSON of our nearby locations based on the $request parameters
+	 *
+	 * @param WP_REST_Request $request
+	 *
+	 * @return mixed|WP_REST_Response
+	 * @throws GuzzleHttp\Exception\GuzzleException
+	 * @since 1.3.0
+	 */
 	public function get_nearby_locations(WP_REST_Request $request)
 	{
-		$zip    = $request->get_param('zip');
-		$radius = $request->get_param('radius');
+		// Returns our set error response
+		$error          = $this->error;
+		$locations      = '';
+		$locationCoords = [];
+		$address        = $request->get_param('zip') ?: null;
+		$distance       = $request->get_param('radius') ?: 10000;
 		
-		$dist_radius      = !(empty($radius)) ? $radius : 5;
-		$near_by_services = [];
-		$no_posts_text    = \get_field('no_locations_text', 'option');
-		$no_posts_text    = (!empty($no_posts_text)) ? $no_posts_text : 'No Locations Found';
-		$coords_array     = $this->get_zip_coords($zip);
+		// Check if the address exists
+		isset($address) && $address !== '' ? $locationCoords = self::get_google_location($address) : null;
 		
-		if (
-			is_array($coords_array) && \array_key_exists('results', $coords_array) && empty($coords_array['results'])
-		)
+		// Assuming the address exists and we were able to retrieve the lat and lng, we'll get our resuts
+		if (isset($locationCoords->lat) && isset($locationCoords->lng))
 		{
-			return [];
-		}
-		
-		$posts = $this->get_posts();
-		
-		if (!empty($posts))
-		{
-			global $post;
-			$near_by_service_post_ids = $this->order_by_nearby($coords_array['lat'], $coords_array['lng'], $posts, $dist_radius);
 			
-			if (isset($near_by_service_post_ids) && !empty($near_by_service_post_ids))
+			// The client doesn't want to filter results and so to always show all locations and just order them,
+			// I setup the radius distance to 10000 miles (which should cover the US).
+			$locations = $this->nearby_query($locationCoords->lat, $locationCoords->lng, $distance);
+			
+			// If we got any results, we'll return them
+			if (count($locations) > 0)
 			{
-				foreach ($near_by_service_post_ids as $key => $post)
-				{
-					$post_id = $post['post']->ID;
-					// error_log( print_r($post['post'], TRUE));
-					$near_by_services[] = [
-						'id'       => $post_id,
-						'slug'     => $post['post']->post_name,
-						'title'    => get_the_title($post_id),
-						'address'  => [
-							'address'  => get_post_meta($post_id, '_map_address', true) ?: '',
-							'address2' => get_post_meta($post_id, '_map_address2', true) ?: '',
-							'city'     => get_post_meta($post_id, '_map_city', true) ?: '',
-							'state'    => get_post_meta($post_id, '_map_state', true) ?: '',
-							'zip'      => get_post_meta($post_id, '_map_zip', true) ?: '',
-						],
-						'phone'    => get_post_meta($post_id, '_map_phone', true) ?
-							[
-								'clean' => preg_replace('/\s+/', '', preg_replace('/[^a-zA-Z0-9\']/', '', get_post_meta($post_id, '_map_phone', true))),
-								'text'  => get_post_meta($post_id, '_map_phone', true),
-							] : '',
-						'website'  => get_post_meta($post_id, '_map_website', true) ?: '',
-						'lat'      => get_post_meta($post_id, '_map_lat', true) ?: '',
-						'lng'      => get_post_meta($post_id, '_map_lng', true) ?: '',
-						'distance' => \number_format((float) $post['distance'], 2),
-					];
-				}
-				
-				wp_reset_postdata();
-				
-				usort($near_by_services, function ($dist_a, $dist_b)
-				{
-					return ((float) $dist_a['distance'] < (float) $dist_b['distance']) ? - 1 : 1;
-				});
+				// Array map our return results
+				$locations = array_map(
+					function ($post)
+					{
+						return [
+							'title'    => get_the_title($post['id']),
+							'slug'     => get_post_field('post_name', $post['id']),
+							'address'  => [
+								'address'  => get_post_meta($post['id'], '_map_address', true) ?: '',
+								'address2' => get_post_meta($post['id'], '_map_address2', true) ?: '',
+								'city'     => get_post_meta($post['id'], '_map_city', true) ?: '',
+								'state'    => get_post_meta($post['id'], '_map_state', true) ?: '',
+								'zip'      => get_post_meta($post['id'], '_map_zip', true) ?: '',
+								'return'   => $this->address($post['id']),
+							],
+							'phone'    => get_post_meta($post['id'], '_map_phone', true) ?
+								[
+									'clean' => preg_replace('/\s+/', '', preg_replace('/[^a-zA-Z0-9\']/', '', get_post_meta($post['id'], '_map_phone', true))),
+									'text'  => get_post_meta($post['id'], '_map_phone', true),
+								] : '',
+							'website'  => get_post_meta($post['id'], '_map_website', true) ?: '',
+							'lat'      => get_post_meta($post['id'], '_map_lat', true) ? (float) get_post_meta($post['id'], '_map_lat', true) : '',
+							'lng'      => get_post_meta($post['id'], '_map_lng', true) ? (float) get_post_meta($post['id'], '_map_lng', true) : '',
+							'distance' => (float) number_format((float) $post['distance'], 2),
+						];
+					},
+					$locations
+				);
+				$locations = json_encode([
+					                         'locations' => $locations,
+					                         'center'    => $locationCoords,
+				                         ]);
+			}
+			// If no results, we'll error
+			else
+			{
+				$locations = new WP_Error('error_no_locations', 'No locations were matched with the params.', ['status' => 200]);
 			}
 		}
 		
-		if (empty($near_by_services))
-		{
-			$near_by_services['no_posts_found'] = $no_posts_text;
-		}
-		
-		return \rest_ensure_response($near_by_services);
+		return rest_ensure_response(!empty($locations) ? $locations : $error);
 	}
 	
-	public function get_zip_coords($zip)
+	/**
+	 * This is our post results in which we'll use SQL to return a location
+	 *
+	 * @param int    $lat      The latitide of Googles Response
+	 * @param int    $lng      The longitude of Googles Response
+	 * @param int    $distance The response distance
+	 * @param string $unit     The unit of measurement, km or miles
+	 *
+	 * @return null|array|object
+	 * @since 1.3.0
+	 */
+	private function nearby_query($lat, $lng, $distance = 1, $unit = 'mi')
 	{
-		$url    = $this->google_api_url . $this->address . \urlencode($zip) . '&key=' . $this->apiKey;
+		global $wpdb;
+		
+		/**
+		 * This sets the radius of the earth in both KM and MI based on the $unit requested
+		 *
+		 * @note: The Earth is not perfectly spherical, but this is considered the 'mean radius'
+		 */
+		$radius = ($unit === 'km' ? 6371.009 : 3958.761);
+		
+		/**
+		 * Using SQL, we'll return the results of posts that match the
+		 * response parameters.
+		 */
+		$query = $wpdb->prepare(
+			"
+        SELECT DISTINCT
+            p.ID as id,
+            p.post_title as title,
+            lat.meta_value as lat,
+            lon.meta_value as lon,
+            ( %d * acos(
+            cos( radians( %s ) )
+            * cos( radians( lat.meta_value ) )
+            * cos( radians( lon.meta_value ) - radians( %s ) )
+            + sin( radians( %s ) )
+            * sin( radians( lat.meta_value ) )
+            ) )
+            AS distance
+        FROM $wpdb->posts p
+        INNER JOIN $wpdb->postmeta lat ON p.ID = lat.post_id
+        INNER JOIN $wpdb->postmeta lon ON p.ID = lon.post_id
+        WHERE 1 = 1
+        AND p.post_type = 'locations'
+        AND p.post_status = 'publish'
+        AND lat.meta_key = '_map_lat'
+        AND lon.meta_key = '_map_lng'
+        HAVING distance < %s
+        ORDER BY distance ASC", $radius, $lat, $lng, $lat, $distance);
+		
+		return ($wpdb->get_results($query, ARRAY_A));
+	}
+	
+	/**
+	 * This will return the location from Google Maps via an API call which we can use for
+	 * determining the center latitutde and longitude of our request Zip Code
+	 *
+	 * @param $address
+	 *
+	 * @return array|object|WP_Error
+	 * @throws GuzzleHttp\Exception\GuzzleException
+	 * @since 1.3.0
+	 */
+	private function get_google_location($address)
+	{
 		$coords = [];
 		
-		try
+		/**
+		 * Check if the address sent to us is empty, we'll need to abort if so
+		 */
+		if (!empty($address))
 		{
-			$ch = curl_init();
-			curl_setopt($ch, CURLOPT_URL, $url);
-			curl_setopt($ch, CURLOPT_ENCODING, 'gzip');
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($ch, CURLOPT_PROXYPORT, 3128);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-			$response = curl_exec($ch);
-			curl_close($ch);
-			$response_a = json_decode($response);
-			
-			if ($response_a->status == 'OK')
+			try
 			{
-				$lat = $response_a->results[0]->geometry->location->lat;
-				$lng = $response_a->results[0]->geometry->location->lng;
+				$response = $this->client->request('GET', $this->google_api_url . urlencode($address) . '&key=' . $this->apiKey);
 				
-				if (isset($lat) && !empty($lat) && isset($lng) && !empty($lng))
+				if ($response->getStatusCode() == '200')
 				{
-					$coords = [
-						'lat' => $lat,
-						'lng' => $lng,
-					];
-				}
-				
-				return $coords;
-			}
-			
-			return [];
-		}
-		catch (\Exception $e)
-		{
-			return [];
-		}
-	}
-	
-	public function order_by_nearby($lat, $lon, $array_of_lat_posts, $distance = 0)
-	{
-		$ordered_Ids_and_distances = [];
-		
-		if ($lat !== 0 && $lon !== 0 && $array_of_lat_posts && count($array_of_lat_posts) > 0)
-		{
-			
-			foreach ($array_of_lat_posts as $array_of_lat_post)
-			{
-				$course_lat  = get_post_meta($array_of_lat_post->ID, '_map_lat', true) ?: null;
-				$course_long = get_post_meta($array_of_lat_post->ID, '_map_lng', true) ?: null;
-				
-				//Prevent call to gmaps API
-				if (isset($course_lat) && isset($course_long))
-				{
-					$dist = $this->getDistance($course_lat, $course_long, $lat, $lon);
-				}
-				else
-				{
-					$dist = 999999999;
-				}
-				
-				if ($distance > 0)
-				{
-					if ($dist < $distance)
+					$body = (string) $response->getBody();
+					$body = json_decode($body);
+					
+					if (!property_exists($body, 'error_message') && isset($body->results) && count($body->results) > 0)
 					{
-						$ordered_Ids_and_distances[] = [
-							'distance' => $dist,
-							'post'     => $array_of_lat_post,
+						$lat = $body->results[0]->geometry->location->lat ?: null;
+						$lng = $body->results[0]->geometry->location->lng ?: null;
+						
+						// Setup an object array floating the values for accuracy
+						$coords = (object) [
+							'lat' => !is_null($lat) ? (float) $lat : null,
+							'lng' => !is_null($lng) ? (float) $lng : null,
 						];
+					}
+					else
+					{
+						throw new Exception('Google Map API - ' . $body->error_message);
 					}
 				}
 			}
-			return $ordered_Ids_and_distances;
+			catch (RequestException $e)
+			{
+				$coords = new RequestException('Google Map API - ' . $e->getResponse()->getBody()->error_message);
+			}
 		}
-		return false;
+		else
+		{
+			$coords = $this->error;
+		}
+		
+		return $coords;
 	}
 	
-	public function getDistance($post_lat, $post_lon, $user_lat, $user_lon)
+	/**
+	 * Validation callback to check the zipcode
+	 *
+	 * @param $value
+	 *
+	 * @return WP_Error
+	 * @since 1.3.0
+	 */
+	public function validate_zip($value)
 	{
-		try
-		{
-			$theta = (float) $post_lon - (float) $user_lon;
-			$dist  = sin(deg2rad((float) $post_lat)) * sin(deg2rad((float) $user_lat)) + cos(deg2rad((float) $post_lat)) * cos(deg2rad((float) $user_lat)) * cos(deg2rad((float) $theta));
-			$dist  = acos($dist);
-			$dist  = rad2deg($dist);
-			$miles = $dist * 60 * 1.1515;
-		}
-		catch (\Exception $e)
-		{
-			//Return unrealistic distance
-			$miles = 999999999999999;
-		}
-		
-		return $miles;
+		return (!is_string($value) || !preg_match('/^[0-9]{5}(?:-[0-9]{4})?$/', $value)) ? new WP_Error('rest_invalid_param', esc_html__('Must be a valid zip code.', 'locations-map'), ['status' => 400]) : $value;
 	}
 	
-	public function validate_zip($value, $request, $param)
+	/**
+	 * A custom function to return an HTML based schema written address block
+	 *
+	 * @param $loc_id
+	 *
+	 * @return string|void
+	 * @since 1.3.0
+	 */
+	private function address($loc_id)
 	{
 		
-		if (!is_string($value) || !\preg_match('/^[0-9]{5}(?:-[0-9]{4})?$/', $value))
-		{
-			return new \WP_Error('rest_invalid_param', esc_html__('Must be a valid zip code.', 'united-way-theme'), ['status' => 400]);
-		}
+		if (!$loc_id || get_post_type($loc_id) !== 'locations')
+			return;
 		
-		return $value;
+		$address = get_post_meta($loc_id, '_map_address', true) ? '<span property="v:streetAddress">' . get_post_meta($loc_id, '_map_address', true) . (get_post_meta($loc_id, '_map_address2', true) ? '<span class="address2">' . get_post_meta($loc_id, '_map_address2', true) . '</span>' : null) . '</span><br />' : '';
+		$city    = get_post_meta($loc_id, '_map_city', true) ? '<span property="v:addressLocality">' . get_post_meta($loc_id, '_map_city', true) . '</span>' : '';
+		$state   = get_post_meta($loc_id, '_map_state', true) ? (get_post_meta($loc_id, '_map_city', true) ? ', ' : null) . '<span property="v:addressRegion">' . get_post_meta($loc_id, '_map_state', true) . '</span>' : '';
+		$zip     = get_post_meta($loc_id, '_map_zip', true) ? (get_post_meta($loc_id, '_map_city', true) || get_post_meta($loc_id, '_map_state', true) ? ' ' : null) . '<span property="v:postalCode">' . get_post_meta($loc_id, '_map_zip', true) . '</span>' : '';
+		
+		return sprintf(
+			'<address>%s</address>',
+			$address . $city . $state . $zip
+		);
 	}
 	
 }

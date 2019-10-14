@@ -196,17 +196,10 @@ class Locations_Maps {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-locations-maps-metaboxes.php';
 		
+		/**
+		 * An admin API dealing with Google Maps calls to get locations
+		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-locations-maps-admin-api.php';
-		
-		/**
-		 * This class allows for a use of get_template_part in the theme
-		 */
-		require_once LOCATIONS_MAPS_PLUGIN_PATH . 'public/class-gamajo-template-loader.php';
-		
-		/**
-		 * This class extends the plugin to allow for overrideable templates
-		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-lm-template-loader.php';
 		
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
@@ -271,7 +264,7 @@ class Locations_Maps {
 		$this->loader->add_action( 'wp_ajax_nopriv_geo_cb', $plugin_mb, 'locations_maps_metabox_ajax');
 		$this->loader->add_action( 'wp_ajax_geo_cb', $plugin_mb, 'locations_maps_metabox_ajax');
 		$this->loader->add_action( 'rest_api_init', $plugin_mb, 'locations_maps_add_custom_fields');
-		$this->loader->add_action( 'post_submitbox_misc_actions', $plugin_mb, 'locations_maps_update_box_custom_fields');
+		// $this->loader->add_action( 'post_submitbox_misc_actions', $plugin_mb, 'locations_maps_update_box_custom_fields');
 	
 		$plugin_api = new Locations_Maps_Admin_API($this->get_plugin_name(), $this->get_version());
 		$this->loader->add_action('rest_api_init', $plugin_api, 'register_routes');

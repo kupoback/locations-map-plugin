@@ -1,13 +1,12 @@
 <?php
 
 //Exit if accessed directly
-use GuzzleHttp\Exception\RequestException;
-use GuzzleHttp\Client;
-
 if (!defined('ABSPATH'))
 	exit;
 
-require_once plugin_dir_path(dirname(__FILE__)) . 'admin/vendor/autoload.php';
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Client;
+require_once plugin_dir_path(dirname(__FILE__)) . 'vendor/autoload.php';
 
 /**
  * Class Name: Locations_Maps_Admin_API
@@ -86,11 +85,14 @@ class Locations_Maps_Admin_API
 	 */
 	public function __construct($plugin_name, $version)
 	{
+		$options =  get_option('lm_options');
+		$get_key = isset( $options['google_geocode_api_key']) ? $options['google_geocode_api_key'] : null;
+		
 		$this->namespace      = 'locations/v1';
 		$this->plugin_name    = $plugin_name;
 		$this->version        = $version;
 		$this->google_api_url = 'https://maps.googleapis.com/maps/api/geocode/json?address=';
-		$this->apiKey         = lm_google_geocode_api_key();
+		$this->apiKey         = !is_null($get_key) ? sanitize_text_field($get_key) : '';
 		$this->client         = new Client(['verify' => false]);
 		$this->error          = [
 			"code" => "error_cannot_access",
@@ -147,13 +149,13 @@ class Locations_Maps_Admin_API
 					if (!property_exists($body, 'error_message') && isset($body->results) && count($body->results) > 0)
 					{
 						
-						property_exists( $body->results[0]->geometry, 'location' ) ?
-							$coords = (object) [
-								'lat' => $body->results[0]->geometry->location->lat ? (float) $body->results[0]->geometry->location->lat : null,
-								'lng' => $body->results[0]->geometry->location->lng ? (float) $body->results[0]->geometry->location->lng : null,
-								'place_id' => property_exists($body->results[0], 'place_id') ? $body->results[0]->place_id : null
-								] : null;
+						$lat = $body->results[0]->geometry->location->lat ?: null;
+						$lng = $body->results[0]->geometry->location->lng ?: null;
 						
+						$coords = (object) [
+							'lat' => !is_null($lat) ? (float) $lat : null,
+							'lng' => !is_null($lng) ? (float) $lng : null,
+						];
 					}
 					else
 					{

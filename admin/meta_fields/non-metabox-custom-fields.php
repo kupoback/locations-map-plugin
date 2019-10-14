@@ -2,7 +2,7 @@
 
 $custom_fields = [
 	[
-		'id'    => 'center_location',
+		'id'    => '_center_location',
 		'title' => 'Center Map Point (Choose 1)',
 	],
 ];
